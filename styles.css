@@ -1,91 +1,39 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Slab');
+@import url('https://fonts.googleapis.com/css?family=Signika');
 *{
     margin:0;
     padding: 0;
-    font-family: 'Roboto Slab', serif;
-}
-html{
     
-    height: 400%;
+    text-decoration: none;
 }
 body{
-    background-image: linear-gradient(rgb(248, 123, 91), rgb(52, 116, 236));
-    background-size: cover;
+    /* background-image only fills the content so fill the content first and then do shit */
+    background-color: aqua;
 }
-#nav-bar {
+nav{
     width: 100%;
-    margin-left: 17%;
+    height: 40px;
+    background-color: white;
 }
-#nav-list{
-    width: 100%;
+nav ul li{
     list-style: none;
-    margin-left: 10px;
-}
-#nav-list>li{
-    
     float: left;
-    font-size: 20px;
-    
-    padding: 10px 3% 0px 2%;   
+    line-height: 40px; 
 }
-#nav-list a{
-    height: 10px;
-    text-decoration: none;
-    color: white;
-    border-bottom: 0.5px white dotted;
-}
-#nav-list a:hover{
-    border-bottom: 0;
-}
-#frontscreen{
-    width: 100%;
-    height: 89.5%;
-    position: absolute;
-    top: 10%;
-    text-align: center;
-}
-#hi-there{
-    font-weight: bold;
-    font-size: 80px;
-    text-shadow: 4px 4px rgb(75, 76, 77) ;
-}
-#discover{
-    margin-top: 30%;
+nav ul li a{
+    font-family: 'Roboto Slab', serif;
+    display: block;
+    padding: 0px 30px;
     font-size: 30px;
+    color: black;
 }
-.topic{
-    width: 100%;
-    height: 60%;
-    position: absolute;
-    /* border: 2px black solid; */
+#wrapper-welcome{
+    width: 80%;
+    margin: 0 auto;
 }
-.topiclink{
-    font-size: 40px;
-    color: white;
-    text-decoration: none;
-    border-bottom: 0.5px white dotted;
-}
-.topiclink:hover{
-    border-bottom: 0;
-}
-#about{
-    left: 10%;
-    top: 100%;
-}
-#blog{
-    left: 80%;
-    top: 160%;
-
-}
-#arts{
-    left: 10%;
-    top : 220%;
-}
-#projects{
-    left: 80%;
-    top: 280%;
-}
-#contact{
-    left: 10%;
-    top: 340%;
+#wrapper-welcome p{
+    font-family: 'Signika', sans-serif;
+    font-weight: bold;
+    color: red;
+    font-size: 50px;
 }
