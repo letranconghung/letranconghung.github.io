@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+
+body{
+    font-family: 'Lato', sans-serif;
+    overflow-x: hidden;
+    color: rgb(182, 223, 144);
+}
+.navbar{
+    font-size: 20px;
+    
+    background-color: rgb(31, 31, 36);
+}
+.navbar-brand img{
+    height: 5px;
+}
+.navbar-nav li{
+    padding-right: 10px;
+}
+.navbar-dark .navbar-nav .nav-link{
+    color: white;
+    padding-top: 10px;
+}
+.navbar-dark .navbar-nav .nav-link .active, 
+.navbar-dark .navbar-nav .nav-link:hover{
+    color: rgb(39, 158, 118);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* // Extra small devices (portrait phones, less than 576px)
+// No media query for `xs` since this is the default in Bootstrap
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) { ... }
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) { ... }
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) { ... }
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) { ... } */
