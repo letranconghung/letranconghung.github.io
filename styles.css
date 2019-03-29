@@ -1,36 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
-
-body{
-    font-family: 'Lato', sans-serif;
-    overflow-x: hidden;
-    color: rgb(182, 223, 144);
-}
-.navbar{
+.customizedNavLink{
     font-size: 20px;
-    
-    background-color: rgb(31, 31, 36);
+    padding-left: 20px !important; 
+    padding-right: 20px !important;
 }
-.navbar-brand img{
-    height: 5px;
-}
-.navbar-nav li{
-    padding-right: 10px;
-}
-.navbar-dark .navbar-nav .nav-link{
-    color: white;
-    padding-top: 10px;
-}
-.navbar-dark .navbar-nav .nav-link .active, 
-.navbar-dark .navbar-nav .nav-link:hover{
-    color: rgb(39, 158, 118);
-}
-
-
-
-
-
-
-
 
 
 
