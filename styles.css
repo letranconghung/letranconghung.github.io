@@ -1,9 +1,47 @@
 .customizedNavLink{
+    color: white !important;
     font-size: 20px;
-    padding-left: 20px !important; 
-    padding-right: 20px !important;
+    margin-left: 20px;
+    border-bottom: 1px white dotted;
+}
+.mainNav{
+    background-color: rgba(14, 12, 12, 0.644) ;
+    width: 100% !important;
+}
+.customizedNavLink:hover{
+    border: none;
+    color: white !important;
+}
+.customizedNavLink:visited{
+    color: white !important;
+}
+.customizedNavLink:active{
+    color: white !important;
 }
 
+#banner1{
+    background-color: red; 
+    text-align: center;
+    padding-top: 20%;
+    padding-bottom: 5%;
+    margin-bottom: 0px;
+}
+#banner2{
+    background-color: blue;
+    color: black;
+    margin-top: 0px !important;
+    text-align: center;
+    padding-bottom: 15%;
+    margin-bottom: 0;
+}
+#knowMore{
+    font-size: 20px;
+    text-align: center;
+
+}
+#knowMoreArrow{
+    color: black;
+}
 
 
 
