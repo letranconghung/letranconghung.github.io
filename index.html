@@ -1,73 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="utf-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-   <!-- Bootstrap CSS -->
-   <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
-   <link rel="stylesheet" href="bootstrap-4.3.1-localHung/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-   <link rel="icon" href="images/hung1.png">
-   <link rel="stylesheet" href="styles.css">
-   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-   <title>Le Tran Cong Hung</title>
+    <meta charset="UTF-8">
+    
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+    <title>Bootstrap powered</title>
 </head>
-
 <body>
+    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light ">
+        <div class="container" id="c1">
+            <a class="navbar-brand" href="#"> <i class="fas fa-image"></i> Purrfect Match</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="fas fa-bars"></span>
+            </button>
+        
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                <a class="nav-link active" href="#">About</a>
+                </li>
+                <li class="nav-item ">
+                <a class="nav-link active" href="#">Contact</a>
+                </li>  
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item ">
+                <a class="nav-link active" href="#">Sign Up <i class="fas fa-user-plus"></i> </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link active" href="#">Log In <i class="fas fa-user"></i></a>
+                </li>
+            </ul>
+            </div>
+            
+        
+        </div>
+    </nav>   
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="content">
+                    <h1>Purrfect Match</h1>
+                    <h3>The only human-feline dating app</h3>
+                    <hr>
+                    <button class="btn btn-lg btn-info">
+                        <i class="fas fa-paw"></i>
+                        Get Started!
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
 
-   <nav class="navbar navbar-expand-lg sticky-top mainNav">
-      <a class="navbar-brand" href="index.html"><img src="/images/hung1.png" alt=""></a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-         <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse " id="navbarNavAltMarkup">
-         <div class="navbar-nav ml-auto" id="navigationalButtons">
-            <a href="/about/about.html" class="nav-link nav-item customizedNavLink">About</a>
-            <a href="/talents/talents.html" class="nav-link nav-item customizedNavLink">Talents & Hobbies</a>
-            <!-- <a href="/arts/arts.html" class="nav-link nav-item customizedNavLink">Arts</a> -->
-            <!-- <a href="https://letranconghung.home.blog" class="nav-link nav-item customizedNavLink">Blog</a> -->
-            <!-- <a href="/projects/projects.html" class="nav-link nav-item customizedNavLink">Projects</a> -->
-            <a href="/achievements/achievements.html" class="nav-link nav-item customizedNavLink">Achievements</a>
-            <a href="/contact/contact.html" class="nav-link nav-item customizedNavLink">Contact</a>
-         </div>
-      </div>
-   </nav>
-
-
-   <!-- Start of Banner section -->
-   <div class="container-fluid">
-      <div class="row">
-            <h1 id="banner1" class="col-12">
-               Hey there, I'm Hung!
-            </h1>
-      </div>
-      <div class="row">
-         <h5 id="banner2" class="col-12">
-            I still have to write this part
-         </h5>
-      </div>
-      <div class="row">
-         <p id="knowMore" class="bg-success col-12">
-            Find out more about me!
-         </p>
-         <i class="fas fa-arrow-down" id="knowMoreArrow"></i>
-      </div>
-      
-   </div>
-
-
-   <!-- End of Banner section -->
-   <!--Bootstrap Scripting Files-->
-   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-   integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-   crossorigin="anonymous"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-   integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-   crossorigin="anonymous"></script>
-   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-   integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-   crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/a305de4902.js"></script>
 </body>
 </html>

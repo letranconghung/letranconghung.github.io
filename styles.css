@@ -1,75 +1,36 @@
-.customizedNavLink{
-    color: white !important;
-    font-size: 20px;
-    margin-left: 20px;
-    border-bottom: 1px white dotted;
-}
-.mainNav{
-    background-color: rgb(0, 0, 0) ;
-    width: 100% !important;
-}
-.customizedNavLink:hover{
-    border: none;
-    color: white !important;
-}
-.customizedNavLink:visited{
-    color: white !important;
-}
-.customizedNavLink:active{
-    color: white !important;
+html{
+    height: 100%;
 }
 
-#banner1{
-    color: white;
-    background-color: red; 
+#content {
     text-align: center;
-    padding-top: 20%;
-    padding-bottom: 5%;
-    margin-bottom: 0px;
-}
-#banner2{
+    padding-top: 25%;
     color: white;
-    background-color: blue;
-    margin-top: 0px !important;
-    text-align: center;
-    padding-bottom: 15%;
-    margin-bottom: 0;
+    font-family: 'Lato', sans-serif;
 }
-#knowMore{
+h1{
+    font-size: 5em;
+    text-align: center;
+    font-weight: bold;
+}
+h3{
+    font-size: 1.5em;
+}
+
+hr{
+    width: 25%;
     color: white;
-    font-size: 20px;
-    text-align: center;
-
+    border-top: 1px solid white;
 }
-#knowMoreArrow{
-    font-size: 30px;
-    color: black;
+body{
+    background: url('catpic.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* // Extra small devices (portrait phones, less than 576px)
-// No media query for `xs` since this is the default in Bootstrap
-
-// Small devices (landscape phones, 576px and up)
-@media (min-width: 576px) { ... }
-
-// Medium devices (tablets, 768px and up)
-@media (min-width: 768px) { ... }
-
-// Large devices (desktops, 992px and up)
-@media (min-width: 992px) { ... }
-
-// Extra large devices (large desktops, 1200px and up)
-@media (min-width: 1200px) { ... } */
+.navbar-toggler{
+    border: 0;
+}
+.navbar-toggler:focus{
+    outline: none;
+}
