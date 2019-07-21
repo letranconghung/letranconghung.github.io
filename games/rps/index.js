@@ -22,12 +22,12 @@
       if(this.data.scores.bot >= this.data.limit){
         display += ` The bot has won.`; 
         main.winnerDecided = true;
-        alert(`The bot has won!`);
+        alert(`The bot has won! Restart to play a new game!`);
       }
       if(this.data.scores.user >= this.data.limit){
         display += ` You have won.`;
         main.winnerDecided = true;
-        alert(`You have won!`);
+        alert(`You have won! Restart to play a new game!`);
       }
       document.getElementById('logs').textContent = display;
       if(main.elimChoice !== ''){
