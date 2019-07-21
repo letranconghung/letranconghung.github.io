@@ -20,10 +20,14 @@
       document.getElementById('userscore').textContent = this.data.scores.user;
       let display = `You chose ${userChoice} and the bot chose ${botChoice} so it's a ${verdict}. The bot ${botStatement} and you ${userStatement}.`;
       if(this.data.scores.bot >= this.data.limit){
-        display += ` The bot have won.`; 
+        display += ` The bot has won.`; 
+        main.winnerDecided = true;
+        alert(`The bot has won!`);
       }
       if(this.data.scores.user >= this.data.limit){
-        display += ` You have won.`; 
+        display += ` You have won.`;
+        main.winnerDecided = true;
+        alert(`You have won!`);
       }
       document.getElementById('logs').textContent = display;
       if(main.elimChoice !== ''){
@@ -106,56 +110,60 @@
     elimpressed: false,
     elimChoiceMade: false,
     elimChoice: '',
+    winnerDecided: false,
     setUpListeners: function(){
-      const imgs = document.querySelectorAll('.img-fluid');
-      const elimbtn = document.getElementById('elimbtn');
-      for(let i = 0;i<imgs.length;++i){
-        const img = imgs[i];
-        img.addEventListener('click', (event)=>{
-          if(this.elimpressed && !this.elimChoiceMade){
-            console.log('elimpressed is true');
-            img.style.opacity = 0.5;
+      if(!this.winnerDecided){
+        const imgs = document.querySelectorAll('.img-fluid');
+        const elimbtn = document.getElementById('elimbtn');
+        for(let i = 0;i<imgs.length;++i){
+          const img = imgs[i];
+          img.addEventListener('click', (event)=>{
+            if(this.elimpressed && !this.elimChoiceMade){
+              console.log('elimpressed is true');
+              img.style.opacity = 0.5;
+              const containers = document.querySelectorAll('#headerContainer'+', '+'#scoreboard' + ', '+ '#rulesContainer');
+              for(let i = 0;i<containers.length;++i){
+                const container = containers[i];
+                container.style.opacity = 1; 
+              }
+              this.elimChoiceMade = true;
+              elimbtn.classList.toggle('btn-danger');
+              elimbtn.classList.toggle('btn-success');
+              document.getElementById('logs').textContent = `You have eliminated ${event.srcElement.id}, now make your choice`;
+              this.elimChoice = event.srcElement.id;
+              console.log(`the elimChoice is ${this.elimChoice}`);
+            }else{
+              if(this.elimChoiceMade){
+                GameController.userMadeCheatedChoice(this.elimChoice,event);
+              }else{
+                GameController.userMadeNormalChoice(event);
+              }
+              
+            }  
+          });
+        }
+        elimbtn.addEventListener('click', (event)=>{
+          if(!this.elimpressed){
+            elimbtn.classList.toggle('btn-danger');
+            elimbtn.classList.toggle('btn-success');
             const containers = document.querySelectorAll('#headerContainer'+', '+'#scoreboard' + ', '+ '#rulesContainer');
             for(let i = 0;i<containers.length;++i){
               const container = containers[i];
-              container.style.opacity = 1; 
+              container.style.opacity = 0.3; 
             }
-            this.elimChoiceMade = true;
-            elimbtn.classList.toggle('btn-danger');
-            elimbtn.classList.toggle('btn-success');
-            document.getElementById('logs').textContent = `You have eliminated ${event.srcElement.id}, now make your choice`;
-            this.elimChoice = event.srcElement.id;
-            console.log(`the elimChoice is ${this.elimChoice}`);
-          }else{
-            if(this.elimChoiceMade){
-              GameController.userMadeCheatedChoice(this.elimChoice,event);
-            }else{
-              GameController.userMadeNormalChoice(event);
+            for(let i = 0;i<imgs.length;++i){
+              const img = imgs[i];
+              img.style.opacity = 1;
             }
-            
-          }  
+            console.log('elim was pressed');
+            document.getElementById('logs').textContent = "You chose to eliminate! Now eliminate 1 choice!";
+            this.elimpressed = !this.elimpressed;
+  
+          }
+          
         });
       }
-      elimbtn.addEventListener('click', (event)=>{
-        if(!this.elimpressed){
-          elimbtn.classList.toggle('btn-danger');
-          elimbtn.classList.toggle('btn-success');
-          const containers = document.querySelectorAll('#headerContainer'+', '+'#scoreboard' + ', '+ '#rulesContainer');
-          for(let i = 0;i<containers.length;++i){
-            const container = containers[i];
-            container.style.opacity = 0.3; 
-          }
-          for(let i = 0;i<imgs.length;++i){
-            const img = imgs[i];
-            img.style.opacity = 1;
-          }
-          console.log('elim was pressed');
-          document.getElementById('logs').textContent = "You chose to eliminate! Now eliminate 1 choice!";
-          this.elimpressed = !this.elimpressed;
 
-        }
-        
-      });
     },
     init: function(){
       GameController.data.scores.bot = 0;
