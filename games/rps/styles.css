@@ -1,0 +1,30 @@
+body{
+    font-family: 'Darker Grotesque', sans-serif;
+    background-color: lightblue;
+}
+
+#gameName{
+    color: rgb(255, 255, 255);
+    background-color: orange;
+}
+
+.scorelabels{
+    font-size: 4rem;
+    font-weight: 700;
+}
+.scores{
+    font-size: 4rem;
+    font-weight: 500;
+}
+
+img:hover{
+    cursor: pointer;
+}
+
+#rules{
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+#eliminate{
+    font-size: 2rem;
+}
