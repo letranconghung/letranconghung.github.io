@@ -1,0 +1,34 @@
+html, body{
+  height: 100%;
+}
+#brand {
+  width: 24px;
+}
+#mainNav{
+  /* display: none; */
+}
+#firstPage{
+  background-image: url('./imgs/overview.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  /* display: none; */
+}
+#firstPageContent{
+  display: none;
+}
+.navbar-dark .navbar-nav .nav-item .nav-link {
+  color: white;
+}
+.navbar-dark .navbar-nav .nav-item .nav-link:hover {
+  color: lightblue;
+}
+
+#fakebody{
+  height: 100%;
+  display: none;
+}
+#ourexcos{
+  height: 100%;
+  background-color: #21B2A6;
+}
