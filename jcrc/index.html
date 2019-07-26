@@ -4,7 +4,8 @@
   <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100i,200i,300,400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -12,52 +13,100 @@
     <link rel="icon" href="./imgs/jcrc logo.jpeg">
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body>
-    <div id="fakebody" class="container-fluid p-0">
-      <nav class="navbar navbar-expand-md navbar-dark fixed-top" id="mainNav">
-      <a class="navbar-brand href="#">
-        <img src="./imgs/jcrc logo.jpeg" alt="JCRC LOGO" id="brand">    
-      </a>
+  <body id="page-top">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <a class="navbar-brand" href="#page-top">#25JCRC</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+        <span class="fas fa-bars"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto p-0">
+        <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link navbarItemCustomized" href="#">Home</a>
+            <a class="nav-link" href="#about">About</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link navbarItemCustomized" href="#ourexcosContent">Our Excos</a>
+            <a class="nav-link" href="#exco">Exco</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link navbarItemCustomized" href="#">Members</a>
+            <a class="nav-link" href="#members">Members</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link navbarItemCustomized" href="#">Events that we organised</a>
+            <a class="nav-link" href="#events">Events</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#contact">Contact</a>
           </li>
         </ul>
       </div>
     </nav>
 
-    <div class="container-fluid d-flex align-items-center justify-content-center " id="firstPage">
-      <div class="text-center" id="firstPageContent">
-        <h1 class="display-1 text-white">25th JCRC</h1>
-        <h3 class="lead text-white"><em>The coolest JCRC ever...</em></h3>
-      </div>
-    </div>
 
-    <div class="container-fluid" id="ourexcos">
-        <div class="row p-5" id="ourexcosContent">
-          <div class="col-6">
-            <h3>hi fasdfasdf</h3>
-          </div>
-          <div class="col-6">
-            <h3>hi fasdfasdf</h3>
+    <header class="masthead h-100">
+      <div class="container h-100">
+        <div class="row h-100 text-center justify-content-center align-items-center">
+          <div class="col-10">
+            <h1 class="text-uppercase text-white font-weight-bold " id="magicText">The coolest JCRC ever...
+            <hr class="my-4" id="headerRule">
           </div>
         </div>
       </div>
-  </div>
-    
+    </header>
+    <section class="" id="about">
+      <div class="container">
+        <div class="row justify-content-center mb-4">
+          <div class="col-6 col-lg-3 text-center">
+            <h2 class="text-white mt-3 sectionHeader">about us</h2>
+          </div>
+        </div>
+        <div class="row justify-content-between align-items-center pb-5">
+          <div class="col-8 col-md-6">
+            <img src="./imgs/jcrc logo.jpeg" alt="" class="img-fluid roundedPic">
+          </div>
+          <div class="col-4 col-md-6 text-center">
+            <p class="text-white font-weight-light">
+              <span class="d-none d-md-flex">Basically we are a group of retarded kids who want to pick up new skills and make some friends cos we are so antisocial. Our pledge is 'as members of jcrc, we solemnly swear to bla bla bla.'. Cool isn't it?</span> 
+              <span class="d-flex d-md-none">a group of retarded kids who want to pick up new skills and make some friends cos we are so antisocial.</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="exco">
+      <div class="container">
+        <div class="row justify-content-center pb-5">
+          <div class="col-6 col-lg-3 text-center">
+            <h2 class="text-white mt-3 sectionHeader">our exco</h2>
+          </div>
+        </div>
+        <div class="row justify-content-center justify-content-md-between">
+          <div class="col-10 col-md-6 col-lg-4 pb-5 flex-column justify-content-start">
+            <img src="./imgs/jcrc logo.jpeg" alt="" class="roundedPic img-fluid">
+            <p class="lead text-center pt-3"><em>President</em> <br>Samuel Oscar Yobeliano</p>
+          </div>
+          <div class="col-10 col-md-6 col-lg-4 pb-5 flex-column justify-content-start">
+            <img src="./imgs/jcrc logo.jpeg" alt="" class="roundedPic img-fluid">
+            <p class="lead text-center pt-3"><em>Vice-President</em> <br>Nguyen Manh Duc</p>
+          </div>
+          <div class="col-10 col-md-6 col-lg-4 pb-5 flex-column justify-content-start">
+            <img src="./imgs/jcrc logo.jpeg" alt="" class="roundedPic img-fluid">
+            <p class="lead text-center pt-3"><em>Vice-President</em> <br>Kevin Leonardo Theo</p>
+          </div>
+          <div class="col-10 col-md-6 col-lg-4 pb-5 flex-column justify-content-start">
+              <img src="./imgs/jcrc logo.jpeg" alt="" class="roundedPic img-fluid">
+              <p class="lead text-center pt-3"><em>President</em> <br>Dion Saleh</p>
+            </div>
+            <div class="col-10 col-md-6 col-lg-4 pb-5 flex-column justify-content-start">
+              <img src="./imgs/jcrc logo.jpeg" alt="" class="roundedPic img-fluid">
+              <p class="lead text-center pt-3"><em>Vice-President</em> <br>Hao Yi</p>
+            </div>
+            <div class="col-10 col-md-6 col-lg-4 pb-5 flex-column justify-content-start">
+              <img src="./imgs/jcrc logo.jpeg" alt="" class="roundedPic img-fluid">
+              <p class="lead text-center pt-3"><em>Vice-President</em> <br>Tiffany Prasetio</p>
+            </div>
+        </div>
+      </div>
+    </section>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

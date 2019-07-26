@@ -1,36 +1,83 @@
+*{
+  font-family: 'Nunito', sans-serif;
+  letter-spacing: .05rem;
+}
 html, body{
   height: 100%;
 }
-#brand {
-  margin-left: 5px;
-  margin-bottom: 5px;
-  width: 24px;
+#magicText{
+  display: none;
 }
-#mainNav{
-  /* display: none; */
-}
-#firstPage{
-  background-image: url('./imgs/overview.jpg');
+.masthead{
+  background-image: url('./imgs/samplebackground.jpg');
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100%;
-  /* display: none; */
 }
-#firstPageContent{
-  display: none;
+#mainNav{
+  padding-left: 5rem;
+  padding-right: 5rem;
+  padding-bottom: 0rem;
+  padding-top: .2rem;
 }
-.navbar-dark .navbar-nav .nav-item .nav-link {
-  color: white;
+#mainNav .navbar-brand{
+  padding-left: .75rem;
 }
-.navbar-dark .navbar-nav .nav-item .nav-link:hover {
-  color: lightblue;
+#mainNav div .navbar-nav .nav-item .nav-link,
+#mainNav .navbar-brand{
+  color: rgba(194, 194, 204, 0.719);
+  text-transform: uppercase;
+  font-weight: 300;
+  transition: 300ms;
+}
+#mainNav div .navbar-nav .nav-item .nav-link {
+  padding-left: .7rem;
+  
+}
+#mainNav div .navbar-nav .nav-item .nav-link:hover,
+#mainNav .navbar-brand:hover,
+#mainNav div .navbar-nav .nav-item .nav-link:active{
+  color: rgba(83, 83, 233, 0.747);
 }
 
-#fakebody{
-  height: 100%;
-  display: none;
+#about{
+  background: linear-gradient(rgb(55, 57, 170),rgba(112, 41, 204, 0.8));
 }
-#ourexcos{
-  height: 100%;
-  background-color: #21B2A6;
+#exco{
+  background: linear-gradient(rgba(18, 219, 108, 0.76),rgb(177, 194, 24));
+}
+.sectionHeader{
+  padding-top: 2rem;
+  border-bottom: 1px solid white;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.fa-bars{
+  color: white;
+}
+.navbar-toggler{
+  border: 0;
+}
+.navbar-toggler:focus{
+  outline: none;
+}
+@media (max-width: 992px ) {
+  #mainNav {
+    background-color: rgb(255, 255, 255);
+  }
+  #mainNav div .navbar-nav .nav-item .nav-link,
+  #mainNav .navbar-brand {
+    color: rgba(37, 192, 140, 0.884);
+  } 
+  #mainNav div .navbar-nav .nav-item .nav-link:hover,
+  #mainNav .navbar-brand:hover {
+    color: rgba(13, 13, 136, 0.863);
+  }
+  .fa-bars{
+    color: rgba(37, 192, 140, 0.884);
+  }
+
+}
+
+.roundedPic{
+  border-radius: 50%;
 }
