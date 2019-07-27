@@ -60,7 +60,7 @@ html, body{
 .navbar-toggler:focus{
   outline: none;
 }
-@media (max-width: 992px ) {
+@media (max-width: 768px ) {
   #mainNav {
     background-color: rgb(255, 255, 255);
   }

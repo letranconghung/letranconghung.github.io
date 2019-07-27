@@ -10,6 +10,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 window.onscroll = function(){
   if(window.innerWidth >=768){
+    console.log(window.innerWidth);
     if(window.scrollY >= ($('#mainNav').height()*5)){
       $('#mainNav').css('backgroundColor', 'rgb(255, 255, 255)');
       $('#mainNav .navbar-brand,#mainNav div .navbar-nav .nav-item .nav-link').css('color', 'rgba(37, 192, 140, 0.884)');
