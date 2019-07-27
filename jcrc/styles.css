@@ -60,7 +60,7 @@ html, body{
 .navbar-toggler:focus{
   outline: none;
 }
-@media (max-width: 768px ) {
+@media (max-width: 767.98px ) {
   #mainNav {
     background-color: rgb(255, 255, 255);
   }
@@ -75,7 +75,6 @@ html, body{
   .fa-bars{
     color: rgba(37, 192, 140, 0.884);
   }
-
 }
 
 .roundedPic{
