@@ -72,11 +72,14 @@ html, body{
   font-weight: 600;
   z-index: 1;
 }
-.roundedPic{
+.roundedPic, #hugelogo{
   transition: 400ms;
   border-radius: 50%;
 }
 
+.roundedPic:hover{
+  cursor: pointer;
+}
 
 
 

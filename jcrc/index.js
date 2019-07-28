@@ -84,6 +84,7 @@ for(let i = 6; i<allMembers.length;i++){
 
 
 $('.roundedPic').mouseenter((event)=>{
+  
   event.target.style.opacity = "0.2";
   const parentid = event.target.parentNode.parentNode.id;
   const message = messages[allMembers.indexOf(parentid)];
