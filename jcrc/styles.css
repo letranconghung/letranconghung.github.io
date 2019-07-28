@@ -43,7 +43,7 @@ html, body{
   background: linear-gradient(rgb(55, 57, 170),rgba(112, 41, 204, 0.8));
 }
 #exco{
-  background: linear-gradient(rgba(18, 219, 108, 0.76),rgb(177, 194, 24));
+  background: linear-gradient(rgba(161, 231, 193, 0.76),rgb(212, 221, 132));
 }
 .sectionHeader{
   padding-top: 2rem;
@@ -60,6 +60,31 @@ html, body{
 .navbar-toggler:focus{
   outline: none;
 }
+
+#members{
+  background: linear-gradient(rgb(157, 224, 136), rgba(22, 122, 89, 0.582));
+}
+
+
+.caption{
+  position: absolute;
+  font-size: 1.3rem;
+  font-weight: 600;
+  z-index: 1;
+}
+.roundedPic{
+  transition: 400ms;
+  border-radius: 50%;
+}
+
+
+
+
+
+
+
+
+
 @media (max-width: 767.98px ) {
   #mainNav {
     background-color: rgb(255, 255, 255);
@@ -75,8 +100,4 @@ html, body{
   .fa-bars{
     color: rgba(37, 192, 140, 0.884);
   }
-}
-
-.roundedPic{
-  border-radius: 50%;
 }
