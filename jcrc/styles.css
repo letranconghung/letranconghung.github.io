@@ -73,12 +73,13 @@ html, body{
   z-index: 1;
 }
 .roundedPic, #hugelogo{
-  transition: 400ms;
+  transition: 250ms;
   border-radius: 50%;
 }
 
 .roundedPic:hover{
   cursor: pointer;
+  filter: blur(5px);
 }
 
 
