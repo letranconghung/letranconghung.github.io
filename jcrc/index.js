@@ -82,9 +82,9 @@ for(let i = 6; i<allMembers.length;i++){
 }
 
 
-
 $('.roundedPic').mouseenter((event)=>{
   event.target.style.opacity = "0.4";
+  event.target.style.filter = "blur(5px)";
   const parentid = event.target.parentNode.parentNode.id;
   const message = messages[allMembers.indexOf(parentid)];
   const capEl = document.querySelector('#'+parentid+' .caption');
@@ -93,9 +93,21 @@ $('.roundedPic').mouseenter((event)=>{
 });
 $('.roundedPic').mouseleave((event)=>{
   event.target.style.opacity = "1";
+  event.target.style.filter = "none";
   const parentid = event.target.parentNode.parentNode.id;
   const message = messages[allMembers.indexOf(parentid)];
   const capEl = document.querySelector('#'+parentid+' .caption');
   const capParentEl = document.querySelector('#' + parentid);
   capEl.textContent = "";
+});
+
+$('.caption').mouseenter((event)=>{
+  const cap = event.target;
+  const capParent = cap.parentNode;
+  const pic = capParent.children[1];
+  const parentid = event.target.parentNode.parentNode.id;
+  const message = messages[allMembers.indexOf(parentid)];
+  pic.style.opacity = "0.4";
+  pic.style.filter = "blur(5px)";
+  cap.textContent = message;
 });

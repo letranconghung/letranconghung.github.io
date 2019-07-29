@@ -78,7 +78,6 @@ html, body{
 }
 
 .roundedPic:hover{
-  cursor: pointer;
   filter: blur(5px);
 }
 
