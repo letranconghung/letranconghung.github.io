@@ -5,6 +5,9 @@
 html, body{
   height: 100%;
 }
+body{
+  position: relative;
+}
 #magicText{
   display: none;
 }
