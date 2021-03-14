@@ -1,6 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&display=swap');
 *{
-  color: black;
+  color: #214F49;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
 }
 body{
-  background-image: url("static/imgs/bg.jpg");
+  background-color: #FAB7A6;
+  /* background-image: url("static/imgs/bg.jpg"); */
+}
+.nav-link, .navbar-brand{
+  color: #214F49 !important;
+  font-family: 'Playfair Display', serif;
+  transition: color .15s ease-in-out;
+}
+.nav-link:hover, .navbar-brand:hover{
+  color: white !important;
+}
+.navbar-brand{
+  font-weight: 900;
+  font-size: 2rem !important;
+}
+.navbar-toggler, .navbar-toggler:focus, .navbar-toggler:active{
+  border-radius: 0;
+  border: none !important;
 }
