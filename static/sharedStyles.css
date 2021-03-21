@@ -2,7 +2,7 @@
   display: none;
 }
 *{
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; */
 }
 body, html{
   height: 100%;

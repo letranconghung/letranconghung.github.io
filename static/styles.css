@@ -1,16 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&display=swap');
+:root{
+  --pigment1: #6B4996;
+  --pigment2: #AAE1F6;
+}
 *{
-  color: #214F49;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Playfair Display', serif;
   font-weight: 700;
 }
 body{
-  background-color: #FAB7A6;
+  background-color: var(--pigment1);
   /* background-image: url("static/imgs/bg.jpg"); */
 }
 .nav-link, .navbar-brand{
-  color: #214F49 !important;
-  font-family: 'Playfair Display', serif;
+  color: var(--pigment2) !important;
   transition: color .15s ease-in-out;
 }
 .nav-link:hover, .navbar-brand:hover{
@@ -23,4 +25,40 @@ body{
 .navbar-toggler, .navbar-toggler:focus, .navbar-toggler:active{
   border-radius: 0;
   border: none !important;
+}
+.banner{
+  color: var(--pigment2);
+}
+.pigment2{
+  color: var(--pigment2)
+}
+#bannerWrapper{
+  height: 100%;
+}
+#aboutMeWrapper{
+  color: var(--pigment1);
+  background-color: var(--pigment2);
+  height: 60%;
+}
+@media only screen{
+  .banner{
+    font-size: 4rem;
+  }
+  .section{
+    font-size: 3rem;
+  }
+  .bannerDiv{
+    margin-top: 200px;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .banner{
+    font-size: 5rem;
+  }
+  .section{
+    font-size: 3.5rem;
+  }
+  .bannerDiv{
+    margin-top: 200px;
+  }
 }
