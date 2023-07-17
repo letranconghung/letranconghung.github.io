@@ -7,4 +7,4 @@ Hi, I'm Hung, a second year at the University of Chicago, studying Math and Comp
 
 In case you couldn't tell, bananas are amazing. I also did not take creative inspirations from anywhere nor anyone when writing the tagline, especially not from news sites like the WaPo.
 ## Notable Update
-I find Professor Babai super cool.
+I find [Professor Babai](https://people.cs.uchicago.edu/~laci/) super cool.
