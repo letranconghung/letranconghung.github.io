@@ -1,6 +1,4 @@
 main:
-  - title: "About"
-    url: /about/
   - title: "Math"
     url: /math/
   - title: "Latest"
@@ -11,4 +9,6 @@ main:
     url: /categories/
   - title: "Tags"
     url: /tags/
+  - title: "TWIMC"
+    url: /twimc/
   

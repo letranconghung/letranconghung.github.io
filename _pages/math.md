@@ -1,11 +1,11 @@
 ---
+title: Math
 permalink: /math/
 layout: single
-author_profile: false
+author_profile: true
 toc: true
 ---
-
-# My UChicago Notes
+## My UChicago Notes
 
 | Quarter     | Course Code | Course Name             | PDF     |
 | ----------- | ----------- | ----------------------- | ------- |
@@ -14,5 +14,5 @@ toc: true
 | Winter 2023 | MATH 20800  | Honors Analysis II      | [PDF]() |
 | Spring 2023 | MATH 20900  | Honors Analysis III     | [PDF]() |
 
-# My "Papers"
+## My "Papers"
 
