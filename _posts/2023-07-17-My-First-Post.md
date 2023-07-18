@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "My First Post (From 1.5 Years Ago)"
+title: "My First Bost (From 1.5 Years Ago)"
 date: 2023-07-17 16:10:45 -0500
 categories: Self
 tags: [Self, Time]
