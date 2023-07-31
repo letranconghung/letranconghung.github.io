@@ -3,7 +3,7 @@ layout: single
 title: "My First Bost (From 1.5 Years Ago)"
 date: 2023-07-17 16:10:45 -0500
 categories: Self
-tags: [Self, Time]
+tags:
 ---
 
 I actually did not recall that I had set up something like this before, albeit with a different framework, theming and all that stuffs, almost **a year and a half ago!**, by the time of writing. You can really tell that I have been super dedicated to writing things out, because this is the first and only entry in that former blog, suitably titled something tangential to "Dragonfruit", another amazing fruit from the tropical country of Vietnam (it's actually still up now, but I wouldn't tell you where it is). And so, as the first post of this new site, I would like to copy wholesale what I myself wrote a year and a half ago, to demonstrate the very point of why I want to do this — that is an online thought dump that I can look back on. I'm not sure if the fact that it's online is fully justified, but I guess... so that I can more easily share these with those that might want to read them? It's also kinda funny and embarrassing at the same time — I don't even want to re read these posts from the past. But here goes:
