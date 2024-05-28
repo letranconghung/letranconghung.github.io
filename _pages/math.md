@@ -16,3 +16,6 @@ toc: true
 
 ## My "Papers"
 
+- My expository paper at the Math REU at UChicago in Summer 2023: [PDF](/assets/pdf/math27000project.pdf)
+- My expository paper as part of final project for MATH 27000 Basic Complex Variables in Spring 2024: [PDF](/assets/pdf/math27000project.pdf)
+
