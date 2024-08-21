@@ -1,11 +1,10 @@
 ---
 layout: single
 author_profile: true
-title: "A Totally Serious Bhe Banana Bost"
+title: "Welcome!"
 ---
 ## What's this?
-Hi, I'm Hung, a second year at the University of Chicago, studying Math and Computer Science. Here is where I make my invaluable contributions to society, i.e. my opinions and thoughts on things. And of course, I just *have* to post them on the Internet!
+Hi, I'm Hung, a rising third year at the University of Chicago, studying Math and Computer Science. Here is where you might be able to find my thoughts, stories and opinions on things.
 
-In case you couldn't tell, bananas are amazing. I also did not take creative inspirations from anywhere nor anyone when writing the tagline, especially not from news sites like the WaPo.
 ## Notable Update
-I find [Professor Babai](https://people.cs.uchicago.edu/~laci/) super cool.
+I am currently participating in the Fields Undergraduate Summer Research Program in Toronto!

@@ -2,7 +2,7 @@
 layout: single
 title: "Sorry, I can't help you"
 date: 2023-07-31 00:06:00 -0500
-categories: Eyes
+categories: Stories
 tags: 
 ---
 It was gonna be a relatively normal Saturday when J and I just had a delightful Potbelly post-climbing dinner and were walking to the Green Line station on Washington and Wabash until out of nowhere, a thin, frail-looking guy came up to us asking for help: "Could you guys help me? You guys can save my life today." In Chicago, the instinct after hearing the first question would just be to just immediately turn them down and go away, but you don't hear the second sentence very often.
