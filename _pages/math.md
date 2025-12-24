@@ -12,7 +12,7 @@ Below are some Math things I have (co-)written:
 - Work done as the final project for MATH 35607: Introduction to Machine Learning, November 2025.
 
 5. **Ratatouille: RL for Micromouse** [\[link\]](https://drive.google.com/file/d/1sV7zPfBtWuEjpEK2cjtbRQItK5gkJVyC/view?usp=drive_link)
-- This one is not really mathy, but I design an environment to make it conducive for an agent to learn the Micromouse task (which I do in real life!)
+- This one is not really mathy, but I design an environment to make it conducive for an agent to learn the Micromouse task (which I do in real life!).
 - Work done as the final project for TTIC 31170: Robot Estimation and Learning, May 2025.
 
 4. **Strong Law of Large Numbers and Kingman's Subadditive Ergodic Theorem** [\[link\]](https://drive.google.com/file/d/1cLyTon8Sf4IZR602hzxe-SpcVyvkwGW2/view?usp=drive_link)
@@ -30,6 +30,6 @@ Below are some Math things I have (co-)written:
 - Work done during the Fields Undergraduate Summer Research Program 2024, August 2024.
 
 1. **Harmony in Randomness: the Laplacian and the Heat Equation**[\[link\]](https://math.uchicago.edu/~may/REU2023/REUPapers/LeTran.pdf)
-- With guidance from Prof. Beniada Shabani
+- With guidance from Prof. Beniada Shabani.
 - I discuss the heat equation, the analytical way to solve it, and its probabilistic interpretations. Personally I think complementing it with the probabilistic point of view is not only interesting, but it provides a very strong intuition as to what ought to be true.
 - Work done during the UChicago Math REU 2023, August 2023.
