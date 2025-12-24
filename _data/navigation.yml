@@ -1,14 +1,7 @@
 main:
   - title: "Math"
     url: /math/
-  - title: "Latest"
-    url: /latest/
-  - title: "Chronoarchive"
-    url: /year-archive/
-  - title: "Categories"
-    url: /categories/
-  - title: "Tags"
-    url: /tags/
-  - title: "TWIMC"
-    url: /twimc/
+  - title: "ML"
+    url: /ml/
+
   
