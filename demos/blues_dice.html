@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blues Würfelspiel — A Dice-Rolled 12-Bar</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Special+Elite&family=Caveat:wght@400;600;700&display=swap');
+
+:root {
+  --chalk-white: #f0ece0;
+  --chalk-dim: #b8b09a;
+  --chalk-faint: #6a6258;
+  --board: #1a2018;
+  --board-mid: #212820;
+  --board-light: #2a3228;
+  --red-chalk: #d4604a;
+  --yellow-chalk: #e8c84a;
+  --blue-chalk: #6aabcc;
+  --green-chalk: #7acc8a;
+  --shadow: rgba(0,0,0,0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0e100d;
+  font-family: 'Special Elite', cursive;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 5rem;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, #1a2a18 0%, transparent 70%);
+}
+
+/* Chalkboard frame */
+.board-frame {
+  background: #3a2a18;
+  padding: 1.4rem 1.6rem 1.8rem;
+  border-radius: 4px;
+  max-width: 960px;
+  width: 100%;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.8),
+    0 8px 40px rgba(0,0,0,0.9),
+    0 0 0 6px #2a1e10,
+    0 0 0 8px #4a3820,
+    0 0 0 12px #2a1e10;
+  position: relative;
+}
+
+/* Wood grain texture on frame */
+.board-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    88deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+  );
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.board {
+  background: var(--board);
+  border-radius: 2px;
+  padding: 2.5rem 2.8rem 3rem;
+  position: relative;
+  min-height: 400px;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3);
+  /* Subtle chalk dust texture */
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.015) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(255,255,255,0.01) 0%, transparent 40%);
+}
+
+/* Chalk texture overlay */
+.board::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 1.8rem;
+  position: relative;
+}
+
+.eyebrow {
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: var(--chalk-faint);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+h1 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: var(--chalk-white);
+  line-height: 1;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5), 0 0 30px rgba(240,236,224,0.08);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: var(--yellow-chalk);
+  letter-spacing: 0.05em;
+}
+
+/* Chalky horizontal rule */
+.chalk-rule {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right,
+    transparent 0%,
+    var(--chalk-faint) 10%,
+    var(--chalk-dim) 50%,
+    var(--chalk-faint) 90%,
+    transparent 100%);
+  margin: 1.2rem 0;
+  position: relative;
+  opacity: 0.6;
+}
+
+/* Mode toggle */
+.mode-toggle {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--chalk-faint);
+  width: fit-content;
+  margin: 0 auto 1.5rem;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--chalk-dim);
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.45rem 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.mode-btn.active {
+  background: var(--chalk-dim);
+  color: var(--board);
+}
+
+.mode-btn:not(.active):hover {
+  color: var(--chalk-white);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Mode description */
+.mode-desc {
+  font-family: 'Caveat', cursive;
+  font-size: 0.88rem;
+  color: var(--chalk-faint);
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  min-height: 1.2rem;
+  transition: opacity 0.3s;
+}
+
+/* 12-bar grid */
+.bar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.bar-cell {
+  border: 1px solid var(--chalk-faint);
+  border-radius: 2px;
+  padding: 0.5rem 0.4rem 0.6rem;
+  min-height: 5.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  opacity: 0.5;
+}
+
+.bar-cell.active-slot {
+  border-color: var(--yellow-chalk);
+  opacity: 1;
+  box-shadow: 0 0 12px rgba(232,200,74,0.15);
+}
+
+.bar-cell.filled {
+  opacity: 1;
+  border-color: var(--chalk-dim);
+}
+
+.bar-cell.filled.new {
+  animation: chalkWrite 0.4s ease;
+}
+
+.bar-cell.now-playing {
+  border-color: var(--red-chalk) !important;
+  box-shadow: 0 0 16px rgba(212,96,74,0.3) !important;
+}
+
+@keyframes chalkWrite {
+  0% { opacity: 0.3; transform: scale(0.95); }
+  60% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.bar-num {
+  font-family: 'Caveat', cursive;
+  font-size: 0.65rem;
+  color: var(--chalk-faint);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  position: absolute;
+  top: 0.3rem;
+  left: 0.4rem;
+}
+
+.bar-function {
+  font-family: 'Caveat', cursive;
+  font-size: 0.6rem;
+  color: var(--chalk-faint);
+  position: absolute;
+  top: 0.3rem;
+  right: 0.4rem;
+}
+
+.bar-chord {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.4rem;
+  color: var(--chalk-white);
+  text-align: center;
+  line-height: 1.1;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+  transition: color 0.3s;
+}
+
+.bar-chord.tonic-color { color: var(--yellow-chalk); }
+.bar-chord.subdom-color { color: var(--blue-chalk); }
+.bar-chord.dom-color { color: var(--red-chalk); }
+.bar-chord.free-color { color: var(--green-chalk); }
+
+.bar-chord-type {
+  font-family: 'Caveat', cursive;
+  font-size: 0.7rem;
+  color: var(--chalk-dim);
+  margin-top: 0.1rem;
+}
+
+/* Empty slot placeholder */
+.bar-cell:not(.filled):not(.active-slot) .bar-chord {
+  color: var(--chalk-faint);
+  font-size: 1.2rem;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.step-label {
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: var(--chalk-dim);
+  letter-spacing: 0.08em;
+  min-height: 1.5rem;
+  text-align: center;
+}
+
+.step-label .highlight {
+  color: var(--yellow-chalk);
+  font-weight: 700;
+}
+
+.dice-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+}
+
+.die-face {
+  font-size: 2.2rem;
+  display: inline-block;
+  opacity: 0;
+  animation: dieIn 0.3s forwards;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+@keyframes dieIn {
+  from { transform: rotate(-30deg) translateY(-8px); opacity: 0; }
+  to { transform: rotate(0deg) translateY(0); opacity: 1; }
+}
+
+.dice-sum {
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: var(--chalk-faint);
+  letter-spacing: 0.1em;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chalk-btn {
+  background: transparent;
+  border: 1.5px solid var(--chalk-dim);
+  color: var(--chalk-white);
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 0.55rem 1.6rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.chalk-btn:hover:not(:disabled) {
+  background: rgba(240,236,224,0.08);
+  border-color: var(--chalk-white);
+}
+
+.chalk-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.chalk-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.chalk-btn.primary {
+  border-color: var(--yellow-chalk);
+  color: var(--yellow-chalk);
+}
+
+.chalk-btn.primary:hover:not(:disabled) {
+  background: rgba(232,200,74,0.1);
+}
+
+.chalk-btn.danger {
+  border-color: var(--red-chalk);
+  color: var(--red-chalk);
+}
+
+/* Lookup table */
+.table-section {
+  margin-top: 1rem;
+}
+
+.table-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 0.6rem;
+  width: fit-content;
+}
+
+.table-toggle-label {
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: var(--chalk-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.table-toggle-label:hover { color: var(--chalk-dim); }
+
+.lookup-wrap {
+  overflow-x: auto;
+  display: none;
+}
+
+.lookup-wrap.open { display: block; }
+
+.lookup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.7rem;
+  min-width: 500px;
+}
+
+.lookup-table th {
+  background: rgba(255,255,255,0.06);
+  color: var(--chalk-faint);
+  font-family: 'Caveat', cursive;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.4rem;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.06);
+  text-transform: uppercase;
+}
+
+.lookup-table td {
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 0.28rem 0.35rem;
+  text-align: center;
+  color: var(--chalk-dim);
+  font-family: 'Caveat', cursive;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.lookup-table td.roll-header {
+  color: var(--chalk-faint);
+  font-weight: 700;
+  background: rgba(0,0,0,0.2);
+  font-size: 0.7rem;
+}
+
+.lookup-table td.hl {
+  background: rgba(232,200,74,0.2) !important;
+  color: var(--yellow-chalk) !important;
+  font-weight: 700;
+}
+
+.lookup-table td.used-cell {
+  color: rgba(176,166,150,0.35);
+}
+
+/* Progress dots */
+.progress-row {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.pdot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--chalk-faint);
+  transition: all 0.2s;
+}
+.pdot.done { background: var(--chalk-dim); }
+.pdot.now { background: var(--yellow-chalk); transform: scale(1.4); }
+
+/* Playback section */
+.playback-row {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+
+/* Instrument selector */
+.instrument-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.inst-label {
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  color: var(--chalk-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 0.2rem;
+}
+
+.inst-btn {
+  background: transparent;
+  border: 1px solid var(--chalk-faint);
+  color: var(--chalk-dim);
+  font-family: 'Caveat', cursive;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.inst-btn:hover {
+  border-color: var(--chalk-dim);
+  color: var(--chalk-white);
+}
+
+.inst-btn.active {
+  background: var(--chalk-dim);
+  color: var(--board);
+  border-color: var(--chalk-dim);
+}
+
+/* Tempo control */
+.tempo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 0.6rem;
+}
+
+.tempo-label {
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  color: var(--chalk-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  min-width: 4rem;
+  text-align: right;
+}
+
+.tempo-slider {
+  -webkit-appearance: none;
+  width: 120px;
+  height: 2px;
+  background: var(--chalk-faint);
+  outline: none;
+  cursor: pointer;
+}
+
+.tempo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--chalk-white);
+  cursor: pointer;
+}
+
+.tempo-val {
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  color: var(--chalk-dim);
+  min-width: 3.5rem;
+}
+
+/* Bottom note */
+.footnote {
+  font-family: 'Caveat', cursive;
+  font-size: 0.78rem;
+  color: var(--chalk-faint);
+  font-style: italic;
+  text-align: center;
+  margin-top: 1.5rem;
+  line-height: 1.6;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(106,98,88,0.3);
+}
+
+/* Complete message */
+.complete-msg {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.1rem;
+  color: var(--yellow-chalk);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .board { padding: 1.5rem 1.2rem 2rem; }
+  .bar-grid { grid-template-columns: repeat(3, 1fr); }
+  h1 { font-size: 1.6rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="board-frame">
+<div class="board">
+
+  <header>
+    <div class="eyebrow">Twelve-Bar Würfelspiel · Key of E</div>
+    <h1>The Blues Dice Game</h1>
+    <div class="subtitle">Roll your progression — then hear what the bones decide</div>
+  </header>
+
+  <div class="chalk-rule"></div>
+
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-blues" onclick="setMode('blues')">Blues Grammar</button>
+    <button class="mode-btn" id="btn-free" onclick="setMode('free')">Free Chromatic</button>
+  </div>
+  <div class="mode-desc" id="modeDesc">
+    Substitutions drawn from the blues tradition — 7ths, 9ths, tritone subs, ♭VII swaps
+  </div>
+
+  <!-- Progress dots -->
+  <div class="progress-row" id="progressRow"></div>
+
+  <!-- Step label -->
+  <div class="controls">
+    <div class="step-label" id="stepLabel">Roll to set <span class="highlight">Bar 1</span></div>
+    <div class="dice-row" id="diceRow">
+      <span style="font-family:'Caveat',cursive;font-size:0.9rem;color:var(--chalk-faint);letter-spacing:0.12em">— awaiting first cast —</span>
+    </div>
+    <div class="dice-sum" id="diceSum"></div>
+    <div class="btn-row">
+      <button class="chalk-btn primary" id="rollBtn" onclick="rollBar()">⚄ Roll</button>
+      <button class="chalk-btn" id="playBtn" onclick="togglePlay()" disabled>▶ Play</button>
+      <button class="chalk-btn danger" onclick="resetAll()">↺ Reset</button>
+    </div>
+    <div class="complete-msg" id="completeMsg">✦ Progression Complete — Press Play ✦</div>
+  </div>
+
+  <!-- 12-bar grid -->
+  <div class="bar-grid" id="barGrid"></div>
+
+  <!-- Tempo -->
+  <div class="tempo-row">
+    <span class="tempo-label">Tempo</span>
+    <input class="tempo-slider" type="range" id="tempoSlider" min="60" max="200" value="100" oninput="updateTempo()">
+    <span class="tempo-val" id="tempoVal">100 bpm</span>
+  </div>
+
+  <!-- Instrument selector -->
+  <div class="instrument-row">
+    <span class="inst-label">Melody ♩</span>
+    <button class="inst-btn active" id="inst-guitar" onclick="setInstrument('guitar')">Guitar</button>
+    <button class="inst-btn" id="inst-piano" onclick="setInstrument('piano')">Piano</button>
+    <button class="inst-btn" id="inst-organ" onclick="setInstrument('organ')">Organ</button>
+    <button class="inst-btn" id="inst-harmonica" onclick="setInstrument('harmonica')">Harmonica</button>
+    <button class="inst-btn" id="inst-horn" onclick="setInstrument('horn')">Horn</button>
+  </div>
+
+  <!-- Lookup table -->
+  <div class="table-section">
+    <div class="table-toggle" onclick="toggleTable()">
+      <span class="table-toggle-label" id="tableToggleLabel">▸ Show Substitution Table</span>
+    </div>
+    <div class="lookup-wrap" id="lookupWrap">
+      <table class="lookup-table" id="lookupTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footnote" id="footnote">
+    Blues Grammar keeps the 12-bar structure but substitutes chords by dice. Free Chromatic mode rolls just 3 chords — one each for the tonic, subdominant, and dominant structural positions — then locks them into the 1-1-1-1-2-2-1-1-3-2-1-1 pattern. The shape of blues survives; the harmony may not.
+  </div>
+
+</div>
+</div>
+
+<script>
+// ============================================================
+// CHORD DEFINITIONS
+// ============================================================
+
+// Frequencies for equal temperament, A4=440
+const NOTE_FREQ = {
+  'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13,
+  'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
+  'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
+};
+
+const ALL_ROOTS = ['E','F','F#','G','G#','A','A#','B','C','C#','D','D#'];
+
+// Chord type definitions: intervals in semitones above root
+const CHORD_TYPES = {
+  '7':    [0, 4, 7, 10],          // dominant 7th
+  'maj7': [0, 4, 7, 11],          // major 7th
+  'm7':   [0, 3, 7, 10],          // minor 7th
+  '9':    [0, 4, 7, 10, 14],      // dominant 9th
+  'm9':   [0, 3, 7, 10, 14],      // minor 9th
+  '°7':   [0, 3, 6, 9],           // diminished 7th
+  'ø7':   [0, 3, 6, 10],          // half-diminished
+};
+
+const CHORD_TYPE_NAMES = Object.keys(CHORD_TYPES);
+
+// Get frequencies for a chord, octave-adjusted for voicing
+function chordFreqs(root, type, octave = 3) {
+  const intervals = CHORD_TYPES[type];
+  const rootIdx = ALL_ROOTS.indexOf(root);
+  const noteNames = Object.keys(NOTE_FREQ);
+  const baseFreq = NOTE_FREQ[root] * Math.pow(2, octave - 4);
+  return intervals.map(i => baseFreq * Math.pow(2, i / 12));
+}
+
+// ============================================================
+// BLUES GRAMMAR TABLES
+// ============================================================
+// 12 bars, for each bar a set of options keyed by dice sum (2-12)
+// Structural roles: I=tonic, IV=subdominant, V=dominant, T=turnaround
+
+// Standard 12-bar structure in E:
+// 1:I  2:I  3:I  4:I  5:IV  6:IV  7:I  8:I  9:V  10:IV  11:I  12:turnaround
+
+const BAR_ROLES = ['I','I','I','I','IV','IV','I','I','V','IV','I','T'];
+
+// For each bar, 11 options (dice sums 2–12)
+// Format: [root, type]
+function bluesTable() {
+  // Tonic (I): E7 the vast majority, occasional E9
+  const tonicOpts = [
+    ['E','7'], ['E','7'], ['E','7'], ['E','7'],
+    ['E','7'], ['E','7'], ['E','7'], ['E','9'],
+    ['E','9'], ['E','7'], ['E','7']
+  ];
+  // Bar 2: quick-change — stays on E7, sometimes jumps to A7
+  const bar2Opts = [
+    ['E','7'], ['E','7'], ['E','7'], ['E','7'],
+    ['E','7'], ['A','7'], ['E','7'], ['E','7'],
+    ['A','7'], ['E','7'], ['E','7']
+  ];
+  // Subdominant (IV): A7 almost always, occasional A9
+  const subdOpts = [
+    ['A','7'], ['A','7'], ['A','7'], ['A','7'],
+    ['A','7'], ['A','7'], ['A','7'], ['A','9'],
+    ['A','9'], ['A','7'], ['A','7']
+  ];
+  // Dominant (V): B7 most of the time, D7 (bVII) as the one allowed sub
+  const domOpts = [
+    ['B','7'], ['B','7'], ['B','7'], ['B','7'],
+    ['B','7'], ['B','7'], ['B','7'], ['B','9'],
+    ['B','7'], ['D','7'], ['B','7']
+  ];
+  // Turnaround (bar 12): B7 to bring it back, one D7 option
+  const turnOpts = [
+    ['B','7'], ['B','7'], ['B','7'], ['B','7'],
+    ['B','7'], ['B','7'], ['B','9'], ['B','7'],
+    ['B','7'], ['D','7'], ['B','7']
+  ];
+
+  const table = [];
+  for (let b = 0; b < 12; b++) {
+    const role = BAR_ROLES[b];
+    if (b === 1) table.push(bar2Opts);
+    else if (role === 'I') table.push(tonicOpts);
+    else if (role === 'IV') table.push(subdOpts);
+    else if (role === 'V') table.push(domOpts);
+    else table.push(turnOpts);
+  }
+  return table;
+}
+
+// Free chromatic table: all 72 root×type combos, pre-shuffled deterministically per bar/roll
+function buildFreeTable() {
+  // Generate all 72 combos
+  const all = [];
+  for (const r of ALL_ROOTS) for (const t of CHORD_TYPE_NAMES) all.push([r, t]);
+
+  // For each bar (12), assign 11 options — pick from all[] via a seeded shuffle
+  function seededPick(bar, rollIdx) {
+    // Simple deterministic but varied selection
+    const idx = ((bar * 37 + rollIdx * 13) * 7919) % all.length;
+    return all[idx];
+  }
+
+  const table = [];
+  for (let b = 0; b < 12; b++) {
+    const row = [];
+    for (let r = 0; r < 11; r++) row.push(seededPick(b, r));
+    table.push(row);
+  }
+  return table;
+}
+
+const BLUES_TABLE = bluesTable();
+const FREE_TABLE = buildFreeTable();
+
+// ============================================================
+// STATE
+// ============================================================
+let mode = 'blues';
+let currentBar = 0;
+let progression = new Array(12).fill(null); // [{root,type}]
+let isComplete = false;
+let isPlaying = false;
+let stopFlag = false;
+let audioCtx = null;
+let tempo = 100; // bpm
+let tableOpen = false;
+
+// Free mode: 3 rolls pick chord for slot 1, 2, 3
+// Pattern: [0,0,0,0,1,1,0,0,2,1,0,0] (0-indexed slots)
+const FREE_PATTERN = [0,0,0,0,1,1,0,0,2,1,0,2]; // bar 12 = slot 2 (dominant/turnaround)
+const FREE_SLOT_LABELS = ['Chord I (tonic shape)', 'Chord II (sub shape)', 'Chord III (dom shape)'];
+let freeSlots = [null, null, null]; // the 3 chosen chords
+let freeRollStep = 0; // 0,1,2 = which slot we're rolling for
+
+const DICE_FACES = ['','⚀','⚁','⚂','⚃','⚄','⚅'];
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  buildGrid();
+  if (mode === 'free') buildFreeProgressDots();
+  else buildProgressDots();
+  buildLookupTable();
+  updateUI();
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-blues').className = 'mode-btn' + (m==='blues'?' active':'');
+  document.getElementById('btn-free').className = 'mode-btn' + (m==='free'?' active':'');
+  document.getElementById('modeDesc').textContent = m === 'blues'
+    ? 'Substitutions drawn from the blues tradition — 7ths, 9ths, ♭VII swaps'
+    : 'Roll 3 chords to fill slots I, II, III — the 12-bar shape locks them in place';
+  buildLookupTable();
+  highlightTable(null, -1);
+  resetAll();
+}
+
+// ============================================================
+// GRID
+// ============================================================
+const ROLE_LABELS = {
+  'I': 'Tonic', 'IV': 'Subdominant', 'V': 'Dominant', 'T': 'Turnaround'
+};
+const ROLE_COLORS = {
+  'I': 'tonic-color', 'IV': 'subdom-color', 'V': 'dom-color', 'T': 'dom-color'
+};
+
+function buildGrid() {
+  const grid = document.getElementById('barGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'bar-cell' + (i === 0 ? ' active-slot' : '');
+    cell.id = `bar-${i}`;
+    cell.innerHTML = `
+      <span class="bar-num">Bar ${i+1}</span>
+      <span class="bar-function">${ROLE_LABELS[BAR_ROLES[i]]}</span>
+      <div class="bar-chord ${ROLE_COLORS[BAR_ROLES[i]]}" id="chord-${i}">—</div>
+      <div class="bar-chord-type" id="ctype-${i}"></div>
+    `;
+    grid.appendChild(cell);
+  }
+}
+
+function buildProgressDots() {
+  const row = document.getElementById('progressRow');
+  row.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot' + (i === 0 ? ' now' : '');
+    d.id = `pdot-${i}`;
+    row.appendChild(d);
+  }
+}
+
+function updateProgressDots() {
+  for (let i = 0; i < 12; i++) {
+    const d = document.getElementById(`pdot-${i}`);
+    if (!d) continue;
+    if (i < currentBar) d.className = 'pdot done';
+    else if (i === currentBar) d.className = 'pdot now';
+    else d.className = 'pdot';
+  }
+}
+
+function buildFreeProgressDots() {
+  const row = document.getElementById('progressRow');
+  row.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot' + (i === 0 ? ' now' : '');
+    d.id = `pdot-${i}`;
+    row.appendChild(d);
+  }
+}
+
+function updateFreeProgressDots() {
+  for (let i = 0; i < 3; i++) {
+    const d = document.getElementById(`pdot-${i}`);
+    if (!d) continue;
+    if (i < freeRollStep) d.className = 'pdot done';
+    else if (i === freeRollStep) d.className = 'pdot now';
+    else d.className = 'pdot';
+  }
+}
+
+// ============================================================
+// LOOKUP TABLE
+// ============================================================
+function buildLookupTable() {
+  const head = document.getElementById('tableHead');
+  const body = document.getElementById('tableBody');
+  head.innerHTML = '';
+  body.innerHTML = '';
+
+  if (mode === 'free') {
+    // 3-column table: one per slot
+    const hr = document.createElement('tr');
+    const th0 = document.createElement('th'); th0.textContent = 'Sum \\ Slot'; hr.appendChild(th0);
+    ['Chord I','Chord II','Chord III'].forEach(label => {
+      const th = document.createElement('th'); th.textContent = label; hr.appendChild(th);
+    });
+    head.appendChild(hr);
+    for (let r = 0; r < 11; r++) {
+      const sum = r + 2;
+      const tr = document.createElement('tr');
+      const td0 = document.createElement('td');
+      td0.className = 'roll-header'; td0.textContent = sum; tr.appendChild(td0);
+      for (let s = 0; s < 3; s++) {
+        const [root, type] = FREE_TABLE[s][r];
+        const td = document.createElement('td');
+        td.id = `tc-${sum}-${s}`;
+        td.textContent = root + type;
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+    }
+  } else {
+    // 12-column blues table
+    const hr = document.createElement('tr');
+    const th0 = document.createElement('th'); th0.textContent = 'Sum \\ Bar'; hr.appendChild(th0);
+    for (let b = 0; b < 12; b++) {
+      const th = document.createElement('th'); th.textContent = b+1; hr.appendChild(th);
+    }
+    head.appendChild(hr);
+    for (let r = 0; r < 11; r++) {
+      const sum = r + 2;
+      const tr = document.createElement('tr');
+      const td0 = document.createElement('td');
+      td0.className = 'roll-header'; td0.textContent = sum; tr.appendChild(td0);
+      for (let b = 0; b < 12; b++) {
+        const [root, type] = BLUES_TABLE[b][r];
+        const td = document.createElement('td');
+        td.id = `tc-${sum}-${b}`;
+        td.textContent = root + type;
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+    }
+  }
+}
+
+function highlightTable(sum, barIdx) {
+  document.querySelectorAll('.lookup-table td.hl').forEach(e => {
+    e.classList.remove('hl');
+    e.classList.add('used-cell');
+  });
+  if (sum === null) return;
+  const cell = document.getElementById(`tc-${sum}-${barIdx}`);
+  if (cell) cell.classList.add('hl');
+}
+
+function toggleTable() {
+  tableOpen = !tableOpen;
+  document.getElementById('lookupWrap').className = 'lookup-wrap' + (tableOpen ? ' open' : '');
+  document.getElementById('tableToggleLabel').textContent =
+    (tableOpen ? '▾ Hide' : '▸ Show') + ' Substitution Table';
+}
+
+// ============================================================
+// DICE ROLL
+// ============================================================
+function rollBar() {
+  if (isComplete || isPlaying) return;
+  ensureCtxRunning();
+
+  const d1 = Math.floor(Math.random()*6)+1;
+  const d2 = Math.floor(Math.random()*6)+1;
+  const sum = d1+d2;
+
+  // Animate dice
+  const diceRow = document.getElementById('diceRow');
+  diceRow.innerHTML = '';
+  [d1,d2].forEach((v,i) => {
+    const s = document.createElement('span');
+    s.className = 'die-face';
+    s.style.animationDelay = `${i*0.1}s`;
+    s.textContent = DICE_FACES[v];
+    diceRow.appendChild(s);
+  });
+  document.getElementById('diceSum').textContent = `Sum: ${sum}`;
+
+  if (mode === 'free') {
+    rollFreeSlot(sum);
+  } else {
+    rollBluesBar(sum);
+  }
+}
+
+function rollBluesBar(sum) {
+  const [root, type] = BLUES_TABLE[currentBar][sum-2];
+  progression[currentBar] = { root, type };
+
+  const cell = document.getElementById(`bar-${currentBar}`);
+  const chordEl = document.getElementById(`chord-${currentBar}`);
+  const ctypeEl = document.getElementById(`ctype-${currentBar}`);
+  cell.classList.remove('active-slot');
+  cell.classList.add('filled','new');
+  setTimeout(() => cell.classList.remove('new'), 500);
+  chordEl.className = `bar-chord ${ROLE_COLORS[BAR_ROLES[currentBar]]}`;
+  chordEl.textContent = root + type;
+  ctypeEl.textContent = chordTypeName(type);
+  highlightTable(sum, currentBar);
+  previewChord(root, type);
+
+  currentBar++;
+  if (currentBar < 12) document.getElementById(`bar-${currentBar}`).classList.add('active-slot');
+  updateProgressDots();
+  updateUI();
+
+  if (currentBar === 12) finishComposition();
+}
+
+function rollFreeSlot(sum) {
+  // Pick root+type for this slot from the free table
+  const [root, type] = FREE_TABLE[freeRollStep][sum-2];
+  freeSlots[freeRollStep] = { root, type };
+
+  // Highlight the free table
+  highlightTable(sum, freeRollStep);
+  previewChord(root, type);
+
+  // Fill in all bars that use this slot — same ROOT, but randomly vary the chord type per bar
+  const slotColors = ['tonic-color','subdom-color','dom-color'];
+  FREE_PATTERN.forEach((slotIdx, barIdx) => {
+    if (slotIdx === freeRollStep) {
+      // Randomly pick a type from the full set for each bar independently
+      const variedType = CHORD_TYPE_NAMES[Math.floor(Math.random() * CHORD_TYPE_NAMES.length)];
+      const chord = { root, type: variedType };
+      progression[barIdx] = chord;
+      const cell = document.getElementById(`bar-${barIdx}`);
+      const chordEl = document.getElementById(`chord-${barIdx}`);
+      const ctypeEl = document.getElementById(`ctype-${barIdx}`);
+      cell.classList.remove('active-slot');
+      cell.classList.add('filled','new');
+      setTimeout(() => cell.classList.remove('new'), 500);
+      chordEl.className = `bar-chord ${slotColors[freeRollStep]}`;
+      chordEl.textContent = root + variedType;
+      ctypeEl.textContent = chordTypeName(variedType);
+    }
+  });
+
+  freeRollStep++;
+
+  // Highlight next unfilled slot's bars
+  if (freeRollStep < 3) {
+    FREE_PATTERN.forEach((slotIdx, barIdx) => {
+      if (slotIdx === freeRollStep) {
+        document.getElementById(`bar-${barIdx}`).classList.add('active-slot');
+      }
+    });
+  }
+
+  updateFreeProgressDots();
+  updateUI();
+
+  if (freeRollStep === 3) {
+    currentBar = 12; // mark complete
+    finishComposition();
+  }
+}
+
+function finishComposition() {
+  isComplete = true;
+  document.getElementById('rollBtn').disabled = true;
+  document.getElementById('playBtn').disabled = false;
+  document.getElementById('completeMsg').style.display = 'block';
+  updateUI();
+}
+
+function chordTypeName(type) {
+  const names = {
+    '7':'dom. 7th','maj7':'maj. 7th','m7':'min. 7th',
+    '9':'dom. 9th','m9':'min. 9th','°7':'dim. 7th','ø7':'half-dim.'
+  };
+  return names[type] || type;
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+let masterOut = null; // compressor → destination
+
+function getCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Master chain: compressor to prevent clipping, then destination
+    const comp = audioCtx.createDynamicsCompressor();
+    comp.threshold.value = -18;
+    comp.knee.value = 6;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.15;
+    const masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.55;
+    comp.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
+    masterOut = comp; // everything connects here
+  }
+  return audioCtx;
+}
+
+function ensureCtxRunning() {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+function playChordSound(root, type, startTime, duration, gain=0.12) {
+  const ctx = getCtx();
+  const freqs = chordFreqs(root, type, 3);
+  freqs.forEach((f, fi) => {
+    const t = startTime + fi * 0.018; // slight strum stagger
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    // sine for bass, triangle for inner voices — no sawtooth to avoid aliasing
+    osc.type = fi === 0 ? 'sine' : 'triangle';
+    // Bass an octave down
+    osc.frequency.value = fi === 0 ? f * 0.5 : f;
+    const noteGain = fi === 0 ? gain * 1.2 : gain * 0.6;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(noteGain, t + 0.025);
+    g.gain.setValueAtTime(noteGain, t + duration * 0.5);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration - 0.04);
+    osc.connect(g);
+    g.connect(masterOut);
+    osc.start(t);
+    osc.stop(t + duration);
+  });
+}
+
+// Current instrument for the riff melody
+let currentInstrument = 'guitar';
+
+function setInstrument(inst) {
+  currentInstrument = inst;
+  document.querySelectorAll('.inst-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('inst-' + inst).classList.add('active');
+}
+
+// Chord tone frequencies — plain arpeggio in octave 4, up then back down
+// E7 → E→G#→B→D→D→B→G#→E
+function getChordToneFreqs(root, type) {
+  const intervals = CHORD_TYPES[type];
+  const rootIdx = ALL_ROOTS.indexOf(root);
+  const C4 = 261.63;
+  return intervals.map(i => C4 * Math.pow(2, (rootIdx + i) / 12));
+}
+
+function playRiff(startTime, barDur, root, type) {
+  const ctx = getCtx();
+  const allTones = getChordToneFreqs(root, type);
+  const tones = allTones.slice(0, 4); // always use first 4 tones only
+  // Up then mirror back: [0,1,2,3,3,2,1,0]
+  const up = tones.map((_, i) => i);
+  const down = [...up].reverse();
+  const pattern = [...up, ...down]; // always 8 notes
+  const noteDur = barDur / pattern.length;
+
+  pattern.forEach((pi, i) => {
+    const freq = tones[pi];
+    const t = startTime + i * noteDur;
+    playRiffNote(ctx, freq, t, noteDur, currentInstrument);
+  });
+}
+
+function playRiffNote(ctx, freq, t, noteDur, instrument) {
+  const g = ctx.createGain();
+
+  if (instrument === 'guitar') {
+    // Sawtooth → lowpass: plucked string feel
+    const osc = ctx.createOscillator();
+    const filt = ctx.createBiquadFilter();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    filt.type = 'lowpass';
+    filt.frequency.value = 1400;
+    filt.Q.value = 1.0;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.22, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + noteDur * 0.75);
+    osc.connect(filt); filt.connect(g); g.connect(masterOut);
+    osc.start(t); osc.stop(t + noteDur);
+
+  } else if (instrument === 'piano') {
+    // Two detuned sines + fast decay
+    [0, 3].forEach(detune => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq * Math.pow(2, detune / 1200);
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0, t);
+      og.gain.linearRampToValueAtTime(0.18, t + 0.008);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + noteDur * 0.7);
+      osc.connect(og); og.connect(masterOut);
+      osc.start(t); osc.stop(t + noteDur);
+    });
+
+  } else if (instrument === 'organ') {
+    // Sine + octave up sine (drawbar feel), sustained
+    [1, 0.5].forEach((mult, hi) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq * (hi === 0 ? 1 : 2);
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0, t);
+      og.gain.linearRampToValueAtTime(hi === 0 ? 0.15 : 0.08, t + 0.015);
+      og.gain.setValueAtTime(hi === 0 ? 0.15 : 0.08, t + noteDur * 0.85);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + noteDur * 0.95);
+      osc.connect(og); og.connect(masterOut);
+      osc.start(t); osc.stop(t + noteDur);
+    });
+
+  } else if (instrument === 'harmonica') {
+    // Triangle + a little 5th overtone, slight vibrato via LFO
+    const osc = ctx.createOscillator();
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    lfo.type = 'sine';
+    lfo.frequency.value = 5.5; // vibrato rate
+    lfoGain.gain.value = freq * 0.012; // vibrato depth
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.2, t + 0.025);
+    g.gain.setValueAtTime(0.2, t + noteDur * 0.7);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + noteDur * 0.92);
+    osc.connect(g); g.connect(masterOut);
+    lfo.start(t); lfo.stop(t + noteDur);
+    osc.start(t); osc.stop(t + noteDur);
+
+  } else if (instrument === 'horn') {
+    // Square wave → bandpass, brassy attack
+    const osc = ctx.createOscillator();
+    const filt = ctx.createBiquadFilter();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    filt.type = 'bandpass';
+    filt.frequency.value = freq * 2.5;
+    filt.Q.value = 2.5;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.13, t + 0.04); // slower attack = brassier
+    g.gain.setValueAtTime(0.13, t + noteDur * 0.65);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + noteDur * 0.9);
+    osc.connect(filt); filt.connect(g); g.connect(masterOut);
+    osc.start(t); osc.stop(t + noteDur);
+  }
+}
+
+// ── DRUMS ──────────────────────────────────────────────────────
+// Kick: sine burst + pitch drop
+function playKick(t) {
+  const ctx = getCtx();
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, t);
+  osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.9, t + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+  osc.connect(g); g.connect(masterOut);
+  osc.start(t); osc.stop(t + 0.3);
+}
+
+// Snare: short noise burst + tone
+function playSnare(t) {
+  const ctx = getCtx();
+  // Noise body
+  const bufSize = ctx.sampleRate * 0.15;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const noiseFilter = ctx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 2200;
+  noiseFilter.Q.value = 0.8;
+  const noiseGain = ctx.createGain();
+  noiseGain.gain.setValueAtTime(0, t);
+  noiseGain.gain.linearRampToValueAtTime(0.35, t + 0.005);
+  noiseGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+  noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(masterOut);
+  noise.start(t); noise.stop(t + 0.2);
+  // Tone body
+  const osc = ctx.createOscillator();
+  const og = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(200, t);
+  osc.frequency.exponentialRampToValueAtTime(120, t + 0.08);
+  og.gain.setValueAtTime(0, t);
+  og.gain.linearRampToValueAtTime(0.2, t + 0.003);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+  osc.connect(og); og.connect(masterOut);
+  osc.start(t); osc.stop(t + 0.15);
+}
+
+// Hi-hat: filtered noise, short decay
+function playHihat(t, open=false) {
+  const ctx = getCtx();
+  const bufSize = ctx.sampleRate * 0.05;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const f = ctx.createBiquadFilter();
+  f.type = 'highpass';
+  f.frequency.value = 7000;
+  const g = ctx.createGain();
+  const decay = open ? 0.18 : 0.06;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.18, t + 0.003);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+  noise.connect(f); f.connect(g); g.connect(masterOut);
+  noise.start(t); noise.stop(t + decay + 0.01);
+}
+
+// Play a full bar of shuffle blues drums
+// Shuffle feel: kick on 1, snare on 2+4, hats on every 8th with swing
+function playDrumBar(startTime, barDur) {
+  const spb = barDur / 4; // seconds per beat
+  const swing = spb * 0.04; // small swing offset for feel
+
+  // Kick: beat 1, and beat 3 for a backbeat kick
+  playKick(startTime);
+  playKick(startTime + spb * 2 + swing * 0.5);
+
+  // Snare: beats 2 and 4
+  playSnare(startTime + spb);
+  playSnare(startTime + spb * 3);
+
+  // Hi-hats: 8th notes with slight swing
+  for (let i = 0; i < 8; i++) {
+    const t = startTime + (i * spb * 0.5) + (i % 2 === 1 ? swing : 0);
+    const isOpen = (i === 3 || i === 7); // open hat before snare
+    playHihat(t, isOpen);
+  }
+}
+
+function previewChord(root, type) {
+  const ctx = ensureCtxRunning();
+  const t = ctx.currentTime + 0.05;
+  playChordSound(root, type, t, 0.6, 0.15);
+}
+
+async function togglePlay() {
+  if (isPlaying) {
+    stopFlag = true;
+    return;
+  }
+  if (!isComplete) return;
+
+  isPlaying = true;
+  stopFlag = false;
+  document.getElementById('playBtn').textContent = '■ Stop';
+
+  const ctx = ensureCtxRunning();
+  const beatsPerBar = 4;
+  const secPerBeat = 60 / tempo;
+  const barDur = beatsPerBar * secPerBeat;
+
+  // Small delay to let resume() settle before reading currentTime
+  await new Promise(r => setTimeout(r, 80));
+  let time = ctx.currentTime + 0.05;
+
+  for (let b = 0; b < 12; b++) {
+    if (stopFlag) break;
+
+    // Highlight bar
+    document.querySelectorAll('.bar-cell.now-playing')
+      .forEach(c => c.classList.remove('now-playing'));
+    document.getElementById(`bar-${b}`).classList.add('now-playing');
+
+    const { root, type } = progression[b];
+    // Chord stab on beat 1 and beat 3
+    playChordSound(root, type, time, barDur * 0.4, 0.2);
+    playChordSound(root, type, time + 2*secPerBeat, barDur * 0.35, 0.15);
+    // Riff layer — chord-aware
+    playRiff(time, barDur, root, type);
+    // Drums
+    playDrumBar(time, barDur);
+
+    // Advance scheduled time BEFORE waiting, so next bar is always in the future
+    time += barDur;
+    await new Promise(r => setTimeout(r, barDur * 1000));
+  }
+
+  document.querySelectorAll('.bar-cell.now-playing')
+    .forEach(c => c.classList.remove('now-playing'));
+
+  isPlaying = false;
+  stopFlag = false;
+  document.getElementById('playBtn').textContent = '▶ Play';
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function updateUI() {
+  if (isComplete) {
+    document.getElementById('stepLabel').innerHTML =
+      `<span class="highlight">${countUnique()} unique chords</span> across 12 bars`;
+  } else if (mode === 'free') {
+    document.getElementById('stepLabel').innerHTML =
+      `Roll for <span class="highlight">${FREE_SLOT_LABELS[freeRollStep]}</span>`;
+  } else {
+    const role = ROLE_LABELS[BAR_ROLES[currentBar]];
+    document.getElementById('stepLabel').innerHTML =
+      `Roll for <span class="highlight">Bar ${currentBar+1}</span> <span style="color:var(--chalk-faint);font-size:0.85rem">(${role})</span>`;
+  }
+}
+
+function countUnique() {
+  const s = new Set(progression.filter(Boolean).map(c => c.root+c.type));
+  return s.size;
+}
+
+function updateTempo() {
+  tempo = parseInt(document.getElementById('tempoSlider').value);
+  document.getElementById('tempoVal').textContent = `${tempo} bpm`;
+}
+
+function resetAll() {
+  if (isPlaying) { stopFlag = true; isPlaying = false; }
+  currentBar = 0;
+  progression = new Array(12).fill(null);
+  isComplete = false;
+  freeSlots = [null, null, null];
+  freeRollStep = 0;
+
+  document.getElementById('rollBtn').disabled = false;
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('playBtn').textContent = '▶ Play';
+  document.getElementById('completeMsg').style.display = 'none';
+  document.getElementById('diceRow').innerHTML =
+    `<span style="font-family:'Caveat',cursive;font-size:0.9rem;color:var(--chalk-faint);letter-spacing:0.12em">— awaiting first cast —</span>`;
+  document.getElementById('diceSum').textContent = '';
+
+  buildGrid();
+  if (mode === 'free') buildFreeProgressDots();
+  else buildProgressDots();
+  buildLookupTable();
+  updateUI();
+}
+
+init();
+</script>
+</body>
+</div>
+</html>
