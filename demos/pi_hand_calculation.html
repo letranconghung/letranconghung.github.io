@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>π by Hand — Human Computer Simulation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg:        #0a0c10;
+  --surface:   #0f1117;
+  --panel:     #13161f;
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.13);
+  --text:      #e2e8f0;
+  --text-dim:  #64748b;
+  --text-faint:#2d3748;
+  --accent:    #3b82f6;
+  --accent-dim:rgba(59,130,246,0.15);
+  --green:     #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --red:       #ef4444;
+  --red-dim:   rgba(239,68,68,0.12);
+  --amber:     #f59e0b;
+  --amber-dim: rgba(245,158,11,0.12);
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Inter', sans-serif;
+  --t0: #f97316; --t1: #eab308; --t2: #22c55e;
+  --t3: #3b82f6; --t4: #a855f7; --t5: #ec4899; --t6: #14b8a6;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 60px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+.app-header {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.app-title {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.app-title span { color: var(--accent); }
+.app-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+/* ── LAYOUT ──────────────────────────────────── */
+.app-body {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  grid-template-rows: auto auto 1fr;
+  gap: 12px;
+}
+
+/* ── PANEL BASE ──────────────────────────────── */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.panel-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-blue  { background: var(--accent-dim); color: var(--accent); }
+.badge-amber { background: var(--amber-dim); color: var(--amber); }
+.badge-red   { background: var(--red-dim); color: var(--red); }
+.panel-body  { padding: 14px; }
+
+/* ── PI ESTIMATE PANEL ────────────────────────── */
+.pi-panel {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+.pi-inner {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.pi-symbol {
+  font-family: var(--mono);
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+.pi-value-wrap { flex: 1; min-width: 0; }
+.pi-label-sm {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+#piValue {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  word-break: break-all;
+  line-height: 1.4;
+}
+#piValue .correct { color: var(--green); }
+#piValue .pending { color: var(--text-dim); }
+.digit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  margin-left: 10px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.digit-badge::before { content: '✓'; font-size: 10px; }
+
+/* Formula strip */
+.formula-strip {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  align-items: center;
+}
+.formula-term { padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+.formula-op   { color: var(--text-faint); padding: 0 3px; }
+
+/* ── GRAPH PANEL ─────────────────────────────── */
+.graph-panel {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+}
+.graph-panel .panel-body { flex: 1; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
+#graphCanvas { display: block; width: 100%; border-radius: 4px; }
+
+/* Stats grid inside graph panel */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stat-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.stat-label {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.stat-value {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+.stat-value.green { color: var(--green); }
+.stat-value.amber { color: var(--amber); }
+
+/* ── FLOOR PANEL ─────────────────────────────── */
+.floor-panel {
+  grid-column: 1 / 2;
+  grid-row: 2 / 4;
+}
+#floorCanvas {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 0 0 8px 8px;
+}
+
+/* ── TEAMS PANEL ─────────────────────────────── */
+.teams-panel {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+}
+.teams-panel .panel-body { padding: 10px 14px; }
+
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.team-row:last-child { border-bottom: none; }
+.team-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.team-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  width: 130px;
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.team-bar-wrap { flex: 1; height: 4px; background: var(--surface); border-radius: 2px; overflow: hidden; }
+.team-bar-inner { height: 100%; border-radius: 2px; transition: width 0.5s ease; width: 0%; }
+.team-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── CONTROLS PANEL ──────────────────────────── */
+.controls-row {
+  grid-column: 1 / 3;
+  grid-row: 4 / 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.ctrl-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.ctrl-label {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.speed-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.speed-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 160px;
+  height: 3px;
+  background: var(--border-hi);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
+.speed-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  width: 32px;
+}
+.btn-group { display: flex; gap: 6px; }
+.btn {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.12s;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.btn:hover { background: rgba(255,255,255,0.05); color: var(--text); border-color: var(--border-hi); }
+.btn.primary {
+  background: var(--accent-dim);
+  border-color: rgba(59,130,246,0.35);
+  color: var(--accent);
+}
+.btn.primary:hover { background: rgba(59,130,246,0.2); }
+
+/* Event log inside controls row */
+.event-stream {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+.event-entry {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+}
+.event-entry.good  { color: var(--green); }
+.event-entry.bad   { color: var(--red); }
+.event-entry.info  { color: var(--accent); }
+
+/* ── TOOLTIP ──────────────────────────────────── */
+#compTooltip {
+  position: fixed;
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  border-radius: 7px;
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
+  display: none;
+  z-index: 200;
+  min-width: 220px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  backdrop-filter: blur(4px);
+}
+.tt-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 3px 0;
+  font-size: 10.5px;
+}
+.tt-row .tt-val { color: var(--text); text-align: right; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-progress-bar {
+  margin-top: 8px;
+  height: 3px;
+  background: var(--surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.tt-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.1s; width: 0%; }
+
+/* ── SCROLLBAR ────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-title"><span>π</span> by Hand — Human Computer Simulation</div>
+  <div class="app-meta">Matt Parker · Pi Day 2024 · Machin-like formula</div>
+</header>
+
+<div class="app-body">
+
+  <!-- PI ESTIMATE -->
+  <div class="panel pi-panel">
+    <div class="panel-header">
+      <div class="panel-title">Current π Estimate</div>
+      <div class="panel-badge badge-green" id="digitBadge">0 correct digits</div>
+    </div>
+    <div class="pi-inner">
+      <div class="pi-symbol">π</div>
+      <div class="pi-value-wrap">
+        <div class="pi-label-sm">computed value</div>
+        <div id="piValue"><span class="pending">3.???…</span></div>
+      </div>
+    </div>
+    <div class="formula-strip" id="formulaStrip">
+      <span style="color:var(--text-dim);margin-right:4px">π =</span>
+    </div>
+  </div>
+
+  <!-- GRAPH + STATS -->
+  <div class="panel graph-panel">
+    <div class="panel-header">
+      <div class="panel-title">Accuracy Over Time</div>
+      <div class="panel-badge badge-blue">digits of π</div>
+    </div>
+    <div class="panel-body">
+      <canvas id="graphCanvas" height="100"></canvas>
+      <div class="stats-grid">
+        <div class="stat-cell">
+          <div class="stat-label">Correct Digits</div>
+          <div class="stat-value green" id="statDigits">0</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Tasks Done</div>
+          <div class="stat-value" id="statTasks">0</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value amber" id="statActive">0</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Rechecks</div>
+          <div class="stat-value" id="statRechecks">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOOR PLAN -->
+  <div class="panel floor-panel">
+    <div class="panel-header">
+      <div class="panel-title">Computation Floor</div>
+      <div style="display:flex;gap:6px">
+        <div class="panel-badge badge-blue" id="floorWorkerBadge">0 active</div>
+        <div class="panel-badge badge-amber" id="floorQueueBadge">0 queued</div>
+      </div>
+    </div>
+    <canvas id="floorCanvas" width="700" height="460"></canvas>
+  </div>
+
+  <!-- TEAMS -->
+  <div class="panel teams-panel">
+    <div class="panel-header">
+      <div class="panel-title">Team Progress</div>
+      <div class="panel-badge badge-blue">7 subteams</div>
+    </div>
+    <div class="panel-body">
+      <div id="teamBarsContainer"></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-row">
+    <div class="ctrl-label">Speed</div>
+    <div class="speed-wrap">
+      <input type="range" class="speed-slider" id="speedSlider" min="1" max="60" value="8" step="1">
+      <div class="speed-val" id="speedVal">8×</div>
+    </div>
+    <div class="ctrl-sep"></div>
+    <div class="btn-group">
+      <button class="btn primary" id="startBtn" onclick="toggleSim()">▶ Run</button>
+      <button class="btn" onclick="resetSim()">↺ Reset</button>
+    </div>
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-label">Log</div>
+    <div class="event-stream" id="eventLog"></div>
+  </div>
+
+</div><!-- end app-body -->
+
+<!-- TOOLTIP -->
+<div id="compTooltip">
+  <div class="tt-name" id="tt-name">—</div>
+  <div class="tt-row"><span>State</span><span class="tt-val" id="tt-state">—</span></div>
+  <div class="tt-row"><span>Task</span><span class="tt-val" id="tt-task">—</span></div>
+  <div class="tt-row"><span>Team</span><span class="tt-val" id="tt-team">—</span></div>
+  <div class="tt-row"><span>Mult. table</span><span class="tt-val" id="tt-table">—</span></div>
+  <div class="tt-row"><span>Progress</span><span class="tt-val" id="tt-progress">—</span></div>
+  <div class="tt-progress-bar"><div class="tt-progress-fill" id="tt-progress-fill"></div></div>
+</div>
+
+<script>
+// ============================================================
+// MATH ENGINE — BigInt fixed-point, 30 decimal digits
+// ============================================================
+const FP = {
+  SCALE: 10n ** 30n,
+  fromInt: n => BigInt(n) * (10n ** 30n),
+  div: (a, b) => a / BigInt(b),
+  divFrac: (num, den) => (BigInt(num) * (10n ** 30n)) / BigInt(den),
+  mul: (a, b) => (a * b) / (10n ** 30n),
+  abs: a => a < 0n ? -a : a,
+};
+
+function computeArctanTermFP(x, k) {
+  const xBig = BigInt(x);
+  const sign = k % 2 === 0 ? 1n : -1n;
+  const denom = BigInt(2 * k + 1);
+  let val = FP.div(FP.SCALE, xBig);
+  for (let i = 0; i < k; i++) { val = val / xBig / xBig; }
+  val = val / denom;
+  return sign * val;
+}
+
+function numTermsNeeded(x, coeff) {
+  const threshold = 5e-21;
+  for (let k = 0; k < 25; k++) {
+    if (Math.abs(coeff) / ((2*k+1) * Math.pow(x, 2*k+1)) < threshold) return k;
+  }
+  return 25;
+}
+
+const PI_DIGITS = "3.14159265358979323846264338327";
+
+function fpToString(val, digits = 25) {
+  const SCALE = 10n ** 30n;
+  const neg = val < 0n;
+  const absVal = neg ? -val : val;
+  const intPart = absVal / SCALE;
+  const fracPart = absVal % SCALE;
+  const fracStr = fracPart.toString().padStart(30, '0').slice(0, digits);
+  return (neg ? '-' : '') + intPart.toString() + '.' + fracStr;
+}
+
+function countCorrectDigits(val) {
+  const s = fpToString(val, 25);
+  if (!s.startsWith('3.')) return 0;
+  let count = 0;
+  for (let i = 2; i < Math.min(s.length, PI_DIGITS.length); i++) {
+    if (s[i] === PI_DIGITS[i]) count++;
+    else break;
+  }
+  return count;
+}
+
+// ============================================================
+// TEAM DEFINITIONS
+// ============================================================
+const TEAM_DEFS = [
+  { id: 0, coeff:  6348, x:   2852, sign:  1, color: '#f97316', label: '6348·arctan(1/2852)' },
+  { id: 1, coeff:  1180, x:   4193, sign:  1, color: '#eab308', label: '1180·arctan(1/4193)' },
+  { id: 2, coeff:  2372, x:   4246, sign:  1, color: '#22c55e', label: '2372·arctan(1/4246)' },
+  { id: 3, coeff:  1436, x:  39307, sign:  1, color: '#3b82f6', label: '1436·arctan(1/39307)' },
+  { id: 4, coeff:  1924, x:  55603, sign:  1, color: '#a855f7', label: '1924·arctan(1/55603)' },
+  { id: 5, coeff:  2500, x: 211050, sign:  1, color: '#ec4899', label: '2500·arctan(1/211050)' },
+  { id: 6, coeff:  2832, x: 390112, sign: -1, color: '#14b8a6', label: '−2832·arctan(1/390112)' },
+];
+
+// ============================================================
+// FLOOR LAYOUT
+// ============================================================
+const FLOOR_W = 700, FLOOR_H = 460;
+
+const LIBRARY    = { x: 510, y: 12,  w: 178, h: 108 };
+const QUEUE_BOARD= { x: 240, y: 12,  w: 158, h: 88  };
+const IDLE_AREA  = { x: 298, y: 268, w: 392, h: 182 };
+
+const TEAM_ZONES = [
+  { x: 10,  y: 162, w: 130, h: 80 },
+  { x: 150, y: 162, w: 130, h: 80 },
+  { x: 290, y: 162, w: 130, h: 80 },
+  { x: 430, y: 162, w: 130, h: 80 },
+  { x: 570, y: 162, w: 120, h: 80 },
+  { x: 10,  y: 258, w: 130, h: 80 },
+  { x: 150, y: 258, w: 130, h: 80 },
+];
+
+const TABLE_SLOTS = Array.from({length: 10}, (_, i) => ({
+  x: LIBRARY.x + 16 + (i % 5) * 32,
+  y: LIBRARY.y + 32 + Math.floor(i / 5) * 36,
+}));
+
+const QUEUE_SLOTS = Array.from({length: 8}, (_, i) => ({
+  x: QUEUE_BOARD.x + 16 + (i % 4) * 34,
+  y: QUEUE_BOARD.y + 28 + Math.floor(i / 4) * 28,
+}));
+
+// ============================================================
+// SIMULATION STATE
+// ============================================================
+let SIM = null;
+let recheckCount = 0;
+
+function buildSim() {
+  recheckCount = 0;
+  const teams = TEAM_DEFS.map(def => ({
+    ...def,
+    numTerms: numTermsNeeded(def.x, def.coeff),
+    tasks: [],
+    partialSum: 0n,
+    zone: TEAM_ZONES[def.id],
+  }));
+
+  const tasks = new Map();
+  for (const team of teams) {
+    for (let k = 0; k < team.numTerms; k++) {
+      const powId   = `t${team.id}_k${k}_pow`;
+      const scaleId = `t${team.id}_k${k}_scale`;
+      const xScale  = Math.max(0, 1 - Math.log(team.x) / Math.log(400000));
+      const baseDur = 2.5 + 4.5 * xScale;
+
+      tasks.set(powId, {
+        id: powId, teamId: team.id, termIndex: k, type: 'pow',
+        dependsOn: k === 0 ? [] : [`t${team.id}_k${k-1}_pow`],
+        duration: baseDur + Math.random() * 1.5,
+        result: null, computations: [], state: 'pending', sign: k%2===0?1:-1,
+        desc: k === 0 ? `Compute 1/${team.x}` : `Divide by ${team.x}² → 1/${team.x}^${2*k+1}`,
+      });
+      tasks.set(scaleId, {
+        id: scaleId, teamId: team.id, termIndex: k, type: 'scale',
+        dependsOn: [powId],
+        duration: baseDur * 0.8 + Math.random() * 1.2,
+        result: null, computations: [], state: 'pending', sign: k%2===0?1:-1,
+        desc: `Apply ÷${2*k+1} × ${team.coeff} (term ${k})`,
+      });
+      team.tasks.push(powId, scaleId);
+    }
+  }
+
+  const NAMES = [
+    'Ada B.','Grace H.','Alan T.','Emmy N.','Lise M.','Cecilia P.','Sofia K.',
+    'Blaise P.','John V.','Dorothy V.','Mary C.','Frances B.','Jean J.',
+    'Betty S.','Ruth T.','Marlyn W.','Kathleen A.','Frances H.','Vera R.',
+    'Alice S.','Helen L.','Edith C.','Florence N.','Augusta L.','Charles B.',
+  ];
+
+  const computers = NAMES.slice(0, 25).map((name, i) => {
+    const angle = (i / 25) * Math.PI * 2;
+    const cx = IDLE_AREA.x + IDLE_AREA.w/2 + Math.cos(angle)*80 + (Math.random()-0.5)*40;
+    const cy = IDLE_AREA.y + IDLE_AREA.h/2 + Math.sin(angle)*50 + (Math.random()-0.5)*30;
+    return {
+      id: i, name, state: 'idle', currentTaskId: null,
+      pos: { x: clamp(cx, IDLE_AREA.x+10, IDLE_AREA.x+IDLE_AREA.w-10),
+             y: clamp(cy, IDLE_AREA.y+10, IDLE_AREA.y+IDLE_AREA.h-10) },
+      targetPos: null, walkSpeed: 55+Math.random()*25,
+      computeTimeLeft: 0, totalComputeTime: 0,
+      tableSlot: null, queueSlot: null, result: null, partnerId: null,
+    };
+  });
+
+  return {
+    teams, tasks, taskQueue: [], computers,
+    piEstimate: 0n, correctDigits: 0,
+    digitHistory: [{t:0,d:0}], simTime: 0, speed: 8,
+    running: false, lastFrameTime: null, selectedCompId: null,
+    tableOccupied: new Array(10).fill(null),
+    queueOccupied: new Array(8).fill(null),
+    eventLog: [], flashEffects: [], allDone: false,
+  };
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+// ============================================================
+// TASK QUEUE LOGIC
+// ============================================================
+function updateTaskQueue(sim) {
+  for (const [id, task] of sim.tasks) {
+    if (task.state !== 'pending') continue;
+    if (task.dependsOn.every(d => sim.tasks.get(d)?.state === 'done')) {
+      task.state = 'queued';
+      if (!sim.taskQueue.includes(id)) sim.taskQueue.push(id);
+    }
+  }
+}
+
+function assignTasks(sim) {
+  const idle = sim.computers.filter(c => c.state === 'idle');
+  if (!idle.length) return;
+  const needsWork = sim.taskQueue.filter(id => {
+    const t = sim.tasks.get(id);
+    return t && t.state === 'queued' && t.computations.length < 2;
+  });
+  let ii = 0;
+  for (const taskId of needsWork) {
+    const task = sim.tasks.get(taskId);
+    const needed = 2 - task.computations.length;
+    for (let n = 0; n < needed && ii < idle.length; n++) {
+      const comp = idle[ii++];
+      const qSlot = sim.queueOccupied.findIndex(v => v === null);
+      if (qSlot === -1) continue;
+      sim.queueOccupied[qSlot] = comp.id;
+      comp.queueSlot = qSlot;
+      comp.currentTaskId = taskId;
+      comp.state = 'walking_to_queue';
+      comp.targetPos = { ...QUEUE_SLOTS[qSlot] };
+      task.computations.push({ computerId: comp.id, result: null, submittedAt: null });
+      if (task.computations.length === 2) {
+        const c0 = sim.computers[task.computations[0].computerId];
+        const c1 = sim.computers[task.computations[1].computerId];
+        c0.partnerId = c1.id; c1.partnerId = c0.id;
+      }
+    }
+  }
+}
+
+// ============================================================
+// COMPUTER TICK
+// ============================================================
+function moveToward(comp, target, dist) {
+  const dx = target.x - comp.pos.x, dy = target.y - comp.pos.y;
+  const d = Math.sqrt(dx*dx+dy*dy);
+  if (d <= dist) { comp.pos = {...target}; return true; }
+  comp.pos.x += (dx/d)*dist; comp.pos.y += (dy/d)*dist;
+  return false;
+}
+
+function computeExact(sim, task) {
+  const team = sim.teams[task.teamId];
+  if (task.type === 'pow') {
+    let val = FP.divFrac(1, team.x);
+    for (let i = 0; i < task.termIndex; i++) {
+      val = FP.div(val, BigInt(team.x));
+      val = FP.div(val, BigInt(team.x));
+    }
+    return val;
+  } else {
+    const powTask = sim.tasks.get(`t${task.teamId}_k${task.termIndex}_pow`);
+    let val = FP.abs(powTask.result);
+    val = val / BigInt(2*task.termIndex+1);
+    val = val * BigInt(team.coeff);
+    const sign = (task.termIndex%2===0 ? 1n : -1n) * BigInt(team.sign);
+    return sign * val;
+  }
+}
+
+function injectError(val) {
+  if (Math.random() < 0.10) {
+    const noise = BigInt(Math.floor(Math.random()*999)+1) * (10n ** 5n);
+    return val + noise;
+  }
+  return val;
+}
+
+function getIdlePos(sim, compId) {
+  const angle = (compId / 25) * Math.PI * 2;
+  return {
+    x: clamp(IDLE_AREA.x+IDLE_AREA.w/2+Math.cos(angle)*80, IDLE_AREA.x+12, IDLE_AREA.x+IDLE_AREA.w-12),
+    y: clamp(IDLE_AREA.y+IDLE_AREA.h/2+Math.sin(angle)*50, IDLE_AREA.y+12, IDLE_AREA.y+IDLE_AREA.h-12),
+  };
+}
+
+function getTeamZoneTarget(teamId) {
+  const z = TEAM_ZONES[teamId];
+  return { x: z.x+z.w/2+(Math.random()-0.5)*20, y: z.y+z.h/2+(Math.random()-0.5)*15 };
+}
+
+function tickComputer(sim, comp, dt) {
+  const mv = comp.walkSpeed * dt;
+  switch (comp.state) {
+    case 'idle': break;
+    case 'walking_to_queue':
+      if (moveToward(comp, comp.targetPos, mv)) { comp.state='at_queue'; comp.computeTimeLeft=0.3+Math.random()*0.4; }
+      break;
+    case 'at_queue':
+      comp.computeTimeLeft -= dt;
+      if (comp.computeTimeLeft <= 0) {
+        const tSlot = sim.tableOccupied.findIndex(v=>v===null);
+        if (tSlot===-1) { comp.computeTimeLeft=0.5; break; }
+        sim.tableOccupied[tSlot] = comp.id; comp.tableSlot = tSlot;
+        comp.targetPos = {...TABLE_SLOTS[tSlot]}; comp.state = 'walking_to_library';
+        if (comp.queueSlot!==null) { sim.queueOccupied[comp.queueSlot]=null; comp.queueSlot=null; }
+      }
+      break;
+    case 'walking_to_library':
+      if (moveToward(comp, comp.targetPos, mv)) {
+        comp.state = 'computing';
+        const task = sim.tasks.get(comp.currentTaskId);
+        comp.totalComputeTime = task ? task.duration : 3;
+        comp.computeTimeLeft = comp.totalComputeTime;
+      }
+      break;
+    case 'computing':
+      comp.computeTimeLeft -= dt;
+      if (comp.computeTimeLeft <= 0) {
+        const task = sim.tasks.get(comp.currentTaskId);
+        comp.result = injectError(computeExact(sim, task));
+        const ce = task.computations.find(c=>c.computerId===comp.id);
+        if (ce) { ce.result=comp.result; ce.submittedAt=sim.simTime; }
+        if (comp.tableSlot!==null) { sim.tableOccupied[comp.tableSlot]=null; comp.tableSlot=null; }
+        comp.targetPos = getTeamZoneTarget(task.teamId);
+        comp.state = 'walking_to_team';
+      }
+      break;
+    case 'walking_to_team':
+      if (moveToward(comp, comp.targetPos, mv)) { comp.state='submitting'; comp.computeTimeLeft=0.4+Math.random()*0.3; }
+      break;
+    case 'submitting':
+      comp.computeTimeLeft -= dt;
+      if (comp.computeTimeLeft <= 0) {
+        const task = sim.tasks.get(comp.currentTaskId);
+        const allSub = task.computations.length===2 && task.computations.every(c=>c.result!==null);
+        if (allSub) {
+          const cids = task.computations.map(c=>c.computerId);
+          const r0=task.computations[0].result, r1=task.computations[1].result;
+          if (r0===r1) {
+            task.result=r0; task.state='done';
+            const qi=sim.taskQueue.indexOf(task.id); if(qi!==-1) sim.taskQueue.splice(qi,1);
+            if (task.type==='scale') {
+              sim.teams[task.teamId].partialSum += r0;
+              updatePiEstimate(sim);
+              addEvent(sim, `✓ T${task.teamId} term ${task.termIndex} verified`, 'good');
+            }
+            addFlash(sim, task.teamId, '#22c55e');
+          } else {
+            task.state='queued'; task.computations=[];
+            recheckCount++;
+            addEvent(sim, `✗ Mismatch on ${task.id} — re-queued`, 'bad');
+            addFlash(sim, task.teamId, '#ef4444');
+          }
+          for (const cid of cids) { const c=sim.computers[cid]; if(c) freeComputer(sim,c); }
+        } else {
+          freeComputer(sim, comp);
+        }
+      }
+      break;
+  }
+}
+
+function freeComputer(sim, comp) {
+  comp.state='idle'; comp.currentTaskId=null; comp.result=null; comp.partnerId=null;
+  if (comp.tableSlot!==null) { sim.tableOccupied[comp.tableSlot]=null; comp.tableSlot=null; }
+  if (comp.queueSlot!==null) { sim.queueOccupied[comp.queueSlot]=null; comp.queueSlot=null; }
+  comp.targetPos = getIdlePos(sim, comp.id);
+}
+
+function addFlash(sim, teamId, color) {
+  const z = TEAM_ZONES[teamId];
+  sim.flashEffects.push({x:z.x+z.w/2, y:z.y+z.h/2, r:40, color, alpha:0.6, decay:1.6});
+}
+
+function addEvent(sim, msg, type='info') {
+  sim.eventLog.unshift({msg,type});
+  if (sim.eventLog.length>30) sim.eventLog.pop();
+}
+
+// ============================================================
+// PI ESTIMATE
+// ============================================================
+function updatePiEstimate(sim) {
+  let sum = 0n;
+  for (const team of sim.teams) sum += team.partialSum;
+  sim.piEstimate = sum;
+  const d = countCorrectDigits(sum);
+  if (d !== sim.correctDigits) {
+    sim.correctDigits = d;
+    sim.digitHistory.push({t:sim.simTime, d});
+    addEvent(sim, `π correct to ${d} decimal digit${d!==1?'s':''}`, 'info');
+  }
+}
+
+// ============================================================
+// SIM LOOP
+// ============================================================
+// EXTEND TAYLOR SERIES
+// ============================================================
+function extendTaylorSeries(sim) {
+  const NEW_TERMS = 3; // add this many new terms per team per round
+  for (const team of sim.teams) {
+    const prevTerms = team.numTerms;
+    const newTerms = prevTerms + NEW_TERMS;
+    for (let k = prevTerms; k < newTerms; k++) {
+      const powId   = `t${team.id}_k${k}_pow`;
+      const scaleId = `t${team.id}_k${k}_scale`;
+      const xScale  = Math.max(0, 1 - Math.log(team.x) / Math.log(400000));
+      const baseDur = 2.5 + 4.5 * xScale;
+
+      sim.tasks.set(powId, {
+        id: powId, teamId: team.id, termIndex: k, type: 'pow',
+        dependsOn: [`t${team.id}_k${k-1}_pow`],
+        duration: baseDur + Math.random() * 1.5,
+        result: null, computations: [], state: 'pending', sign: k%2===0?1:-1,
+        desc: `Divide by ${team.x}² → 1/${team.x}^${2*k+1}`,
+      });
+      sim.tasks.set(scaleId, {
+        id: scaleId, teamId: team.id, termIndex: k, type: 'scale',
+        dependsOn: [powId],
+        duration: baseDur * 0.8 + Math.random() * 1.2,
+        result: null, computations: [], state: 'pending', sign: k%2===0?1:-1,
+        desc: `Apply ÷${2*k+1} × ${team.coeff} (term ${k})`,
+      });
+      team.tasks.push(powId, scaleId);
+    }
+    team.numTerms = newTerms;
+  }
+  addEvent(sim, `Added ${NEW_TERMS} more Taylor terms per team`, 'info');
+}
+
+// ============================================================
+function simTick(sim, dt) {
+  sim.simTime += dt;
+  const allDone = [...sim.tasks.values()].every(t=>t.state==='done');
+  if (allDone && !sim.allDone) {
+    sim.allDone=true;
+    addEvent(sim, 'Round complete — extending Taylor series…', 'good');
+    extendTaylorSeries(sim);
+    sim.allDone=false;
+  }
+  updateTaskQueue(sim);
+  assignTasks(sim);
+  for (const comp of sim.computers) tickComputer(sim, comp, dt);
+  for (const comp of sim.computers) {
+    if (comp.state==='idle') {
+      if (!comp.targetPos || (Math.abs(comp.pos.x-comp.targetPos.x)<2 && Math.abs(comp.pos.y-comp.targetPos.y)<2))
+        if (Math.random()<0.005) comp.targetPos=getIdlePos(sim,comp.id);
+      if (comp.targetPos) moveToward(comp, comp.targetPos, comp.walkSpeed*dt*0.3);
+    }
+  }
+  for (let i=sim.flashEffects.length-1; i>=0; i--) {
+    sim.flashEffects[i].alpha -= sim.flashEffects[i].decay*dt;
+    if (sim.flashEffects[i].alpha<=0) sim.flashEffects.splice(i,1);
+  }
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+let floorCanvas, floorCtx, graphCanvas, graphCtx, dpr=1;
+
+function initCanvas() {
+  dpr = window.devicePixelRatio || 1;
+  floorCanvas = document.getElementById('floorCanvas');
+  floorCtx = floorCanvas.getContext('2d');
+  floorCanvas.width = FLOOR_W*dpr; floorCanvas.height = FLOOR_H*dpr;
+  floorCanvas.style.width='100%'; floorCanvas.style.height='auto';
+  floorCtx.scale(dpr, dpr);
+
+  graphCanvas = document.getElementById('graphCanvas');
+  graphCtx = graphCanvas.getContext('2d');
+  // will be sized in renderGraph based on clientWidth
+  floorCanvas.addEventListener('click', onFloorClick);
+  floorCanvas.addEventListener('mousemove', onFloorHover);
+}
+
+// Color helpers
+function hexAlpha(hex, a) {
+  // returns hex + 2-digit alpha
+  return hex + Math.round(a*255).toString(16).padStart(2,'0');
+}
+
+function renderFloor(sim) {
+  const ctx = floorCtx;
+  ctx.clearRect(0,0,FLOOR_W,FLOOR_H);
+
+  // Background
+  ctx.fillStyle = '#0a0c10';
+  ctx.fillRect(0,0,FLOOR_W,FLOOR_H);
+
+  // Subtle dot grid
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  for (let gx=20; gx<FLOOR_W; gx+=30)
+    for (let gy=20; gy<FLOOR_H; gy+=30) {
+      ctx.beginPath(); ctx.arc(gx,gy,1,0,Math.PI*2); ctx.fill();
+    }
+
+  // Flash effects
+  for (const f of sim.flashEffects) {
+    const g = ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r*2.5);
+    g.addColorStop(0, hexAlpha(f.color, f.alpha*0.7));
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(f.x,f.y,f.r*2.5,0,Math.PI*2); ctx.fill();
+  }
+
+  // ── LIBRARY ──────────────────────────────────
+  const L = LIBRARY;
+  ctx.fillStyle = 'rgba(59,130,246,0.06)';
+  ctx.fillRect(L.x,L.y,L.w,L.h);
+  ctx.strokeStyle = 'rgba(59,130,246,0.3)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(L.x+0.5,L.y+0.5,L.w-1,L.h-1);
+  // corner accent
+  ctx.strokeStyle = 'rgba(59,130,246,0.7)';
+  ctx.lineWidth = 2;
+  drawCornerAccent(ctx, L.x, L.y, 10);
+  drawCornerAccent(ctx, L.x+L.w, L.y, 10, 1);
+  // label
+  ctx.fillStyle = 'rgba(59,130,246,0.9)';
+  ctx.font = '500 10px Inter, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('LIBRARY', L.x+8, L.y+12);
+  ctx.fillStyle = 'rgba(59,130,246,0.4)';
+  ctx.font = '9px Inter';
+  ctx.fillText('multiplication tables', L.x+8, L.y+24);
+  // table slots
+  for (let i=0; i<10; i++) {
+    const s = TABLE_SLOTS[i];
+    const occ = sim.tableOccupied[i]!==null;
+    ctx.fillStyle = occ ? 'rgba(59,130,246,0.5)' : 'rgba(59,130,246,0.12)';
+    ctx.fillRect(s.x-9,s.y-9,18,14);
+    ctx.strokeStyle = occ ? 'rgba(59,130,246,0.8)' : 'rgba(59,130,246,0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(s.x-9,s.y-9,18,14);
+    if (occ) {
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '7.5px JetBrains Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('×'+(i+1), s.x, s.y+1);
+    }
+  }
+
+  // ── TASK QUEUE ────────────────────────────────
+  const Q = QUEUE_BOARD;
+  const qCount = sim.taskQueue.filter(id=>sim.tasks.get(id)?.state==='queued').length;
+  ctx.fillStyle = 'rgba(245,158,11,0.06)';
+  ctx.fillRect(Q.x,Q.y,Q.w,Q.h);
+  ctx.strokeStyle = 'rgba(245,158,11,0.3)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(Q.x+0.5,Q.y+0.5,Q.w-1,Q.h-1);
+  ctx.strokeStyle = 'rgba(245,158,11,0.7)';
+  ctx.lineWidth = 2;
+  drawCornerAccent(ctx, Q.x, Q.y, 10);
+  drawCornerAccent(ctx, Q.x+Q.w, Q.y, 10, 1);
+  ctx.fillStyle = 'rgba(245,158,11,0.9)';
+  ctx.font = '500 10px Inter';
+  ctx.textAlign = 'left';
+  ctx.fillText('TASK QUEUE', Q.x+8, Q.y+12);
+  ctx.font = 'bold 20px JetBrains Mono';
+  ctx.fillStyle = qCount>0 ? 'rgba(245,158,11,0.9)' : 'rgba(245,158,11,0.25)';
+  ctx.textAlign = 'center';
+  ctx.fillText(qCount, Q.x+Q.w/2, Q.y+Q.h-16);
+  ctx.font = '9px Inter';
+  ctx.fillStyle = 'rgba(245,158,11,0.5)';
+  ctx.fillText('pending', Q.x+Q.w/2, Q.y+Q.h-4);
+
+  // ── IDLE ZONE ─────────────────────────────────
+  const IA = IDLE_AREA;
+  ctx.fillStyle = 'rgba(255,255,255,0.015)';
+  ctx.fillRect(IA.x,IA.y,IA.w,IA.h);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4,6]);
+  ctx.strokeRect(IA.x+0.5,IA.y+0.5,IA.w-1,IA.h-1);
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.font = '9px Inter';
+  ctx.textAlign = 'left';
+  ctx.fillText('IDLE AREA', IA.x+8, IA.y+13);
+
+  // ── TEAM ZONES ───────────────────────────────
+  for (let i=0; i<sim.teams.length; i++) {
+    const team = sim.teams[i];
+    const z = TEAM_ZONES[i];
+    const termsDone = team.tasks.filter(id=>id.endsWith('_scale')&&sim.tasks.get(id)?.state==='done').length;
+    const prog = termsDone/team.numTerms;
+    const c = team.color;
+
+    // bg fill
+    ctx.fillStyle = hexAlpha(c, 0.05);
+    ctx.fillRect(z.x,z.y,z.w,z.h);
+    // progress fill from bottom
+    if (prog>0) {
+      ctx.fillStyle = hexAlpha(c, 0.12);
+      ctx.fillRect(z.x, z.y+z.h*(1-prog), z.w, z.h*prog);
+    }
+    // border
+    ctx.strokeStyle = hexAlpha(c, 0.3);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(z.x+0.5,z.y+0.5,z.w-1,z.h-1);
+    // corner accent
+    ctx.strokeStyle = hexAlpha(c, 0.8);
+    ctx.lineWidth = 2;
+    drawCornerAccent(ctx, z.x, z.y, 8);
+    drawCornerAccent(ctx, z.x+z.w, z.y, 8, 1);
+    // progress bar at bottom
+    ctx.fillStyle = hexAlpha(c, 0.15);
+    ctx.fillRect(z.x+4, z.y+z.h-7, z.w-8, 3);
+    ctx.fillStyle = hexAlpha(c, 0.85);
+    ctx.fillRect(z.x+4, z.y+z.h-7, (z.w-8)*prog, 3);
+    // label
+    ctx.fillStyle = hexAlpha(c, 0.9);
+    ctx.font = '500 9.5px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(`T${i}`, z.x+z.w/2, z.y+13);
+    ctx.font = '8.5px JetBrains Mono';
+    ctx.fillStyle = hexAlpha(c, 0.55);
+    ctx.fillText(`1/${team.x}`, z.x+z.w/2, z.y+26);
+    ctx.font = '8px Inter';
+    ctx.fillStyle = hexAlpha(c, 0.45);
+    ctx.fillText(`${termsDone}/${team.numTerms} terms`, z.x+z.w/2, z.y+z.h-13);
+  }
+
+  // ── WALKING PATHS ─────────────────────────────
+  ctx.setLineDash([2,4]);
+  ctx.lineWidth=1;
+  for (const comp of sim.computers) {
+    if (comp.targetPos && comp.state!=='idle' && comp.state!=='computing') {
+      const task=comp.currentTaskId?sim.tasks.get(comp.currentTaskId):null;
+      const col=task?sim.teams[task.teamId].color:'#888';
+      ctx.strokeStyle=hexAlpha(col,0.25);
+      ctx.beginPath();
+      ctx.moveTo(comp.pos.x,comp.pos.y);
+      ctx.lineTo(comp.targetPos.x,comp.targetPos.y);
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+
+  // ── COMPUTER DOTS ─────────────────────────────
+  for (const comp of sim.computers) {
+    const task=comp.currentTaskId?sim.tasks.get(comp.currentTaskId):null;
+    const team=task?sim.teams[task.teamId]:null;
+    const col=team?team.color:'#475569';
+    const sel=sim.selectedCompId===comp.id;
+    const r=sel?8:5.5;
+
+    // glow when computing
+    if (comp.state==='computing') {
+      const g=ctx.createRadialGradient(comp.pos.x,comp.pos.y,0,comp.pos.x,comp.pos.y,18);
+      g.addColorStop(0, hexAlpha(col,0.35));
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(comp.pos.x,comp.pos.y,18,0,Math.PI*2); ctx.fill();
+    }
+
+    // dot
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(comp.pos.x,comp.pos.y,r,0,Math.PI*2); ctx.fill();
+
+    // selection ring
+    if (sel) {
+      ctx.strokeStyle='#ffffff';
+      ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(comp.pos.x,comp.pos.y,r+3,0,Math.PI*2); ctx.stroke();
+    }
+
+    // compute progress arc
+    if (comp.state==='computing' && comp.totalComputeTime>0) {
+      const prog=1-comp.computeTimeLeft/comp.totalComputeTime;
+      ctx.strokeStyle='rgba(255,255,255,0.7)';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.arc(comp.pos.x,comp.pos.y,r+4,-Math.PI/2,-Math.PI/2+prog*Math.PI*2);
+      ctx.stroke();
+    }
+  }
+
+  // ── STATUS LINE ───────────────────────────────
+  const active = sim.computers.filter(c=>c.state!=='idle').length;
+  ctx.fillStyle='rgba(71,85,105,0.6)';
+  ctx.font='9px Inter';
+  ctx.textAlign='left';
+  ctx.fillText(`${active} active`, 8, FLOOR_H-6);
+  ctx.textAlign='right';
+  ctx.fillText('click a dot to inspect', FLOOR_W-8, FLOOR_H-6);
+}
+
+function drawCornerAccent(ctx, x, y, size, flip=0) {
+  ctx.beginPath();
+  if (flip===0) {
+    ctx.moveTo(x, y+size); ctx.lineTo(x, y); ctx.lineTo(x+size, y);
+  } else {
+    ctx.moveTo(x-size, y); ctx.lineTo(x, y); ctx.lineTo(x, y+size);
+  }
+  ctx.stroke();
+}
+
+function renderGraph(sim) {
+  const ctx = graphCtx;
+  // sync canvas size to DOM size
+  const W = graphCanvas.clientWidth || 296;
+  const H = graphCanvas.clientHeight || 100;
+  if (graphCanvas.width !== W*dpr || graphCanvas.height !== H*dpr) {
+    graphCanvas.width = W*dpr;
+    graphCanvas.height = H*dpr;
+    ctx.scale(dpr,dpr);
+  }
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0a0c10';
+  ctx.fillRect(0,0,W,H);
+
+  const maxD=20;
+  const pad={l:28,r:8,t:6,b:18};
+  const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+
+  // grid lines
+  for (let d=0; d<=maxD; d+=5) {
+    const y=pad.t+iH-(d/maxD)*iH;
+    ctx.strokeStyle = d===0 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.04)';
+    ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+iW,y); ctx.stroke();
+    ctx.fillStyle='rgba(100,116,139,0.7)';
+    ctx.font='8px JetBrains Mono';
+    ctx.textAlign='right';
+    ctx.fillText(d, pad.l-4, y+3);
+  }
+
+  // x axis
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+iH); ctx.lineTo(pad.l+iW,pad.t+iH); ctx.stroke();
+
+  if (sim.digitHistory.length < 2) return;
+  const maxT=Math.max(sim.digitHistory[sim.digitHistory.length-1].t,10);
+
+  // area fill
+  ctx.beginPath();
+  const firstPt = sim.digitHistory[0];
+  ctx.moveTo(pad.l+(firstPt.t/maxT)*iW, pad.t+iH);
+  for (const {t,d} of sim.digitHistory) {
+    ctx.lineTo(pad.l+(t/maxT)*iW, pad.t+iH-(d/maxD)*iH);
+  }
+  const lastX=pad.l+iW;
+  ctx.lineTo(lastX, pad.t+iH-(sim.digitHistory[sim.digitHistory.length-1].d/maxD)*iH);
+  ctx.lineTo(lastX, pad.t+iH);
+  ctx.closePath();
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+iH);
+  grad.addColorStop(0,'rgba(34,197,94,0.2)');
+  grad.addColorStop(1,'rgba(34,197,94,0.02)');
+  ctx.fillStyle=grad;
+  ctx.fill();
+
+  // line
+  ctx.beginPath();
+  for (let i=0; i<sim.digitHistory.length; i++) {
+    const {t,d}=sim.digitHistory[i];
+    const px=pad.l+(t/maxT)*iW, py=pad.t+iH-(d/maxD)*iH;
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.lineTo(lastX, pad.t+iH-(sim.digitHistory[sim.digitHistory.length-1].d/maxD)*iH);
+  ctx.strokeStyle='#22c55e';
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  // endpoint dot
+  const endY=pad.t+iH-(sim.digitHistory[sim.digitHistory.length-1].d/maxD)*iH;
+  ctx.fillStyle='#22c55e';
+  ctx.beginPath(); ctx.arc(lastX, endY, 3, 0, Math.PI*2); ctx.fill();
+
+  // x axis label
+  ctx.fillStyle='rgba(100,116,139,0.5)';
+  ctx.font='8px Inter';
+  ctx.textAlign='center';
+  ctx.fillText('sim time →', pad.l+iW/2, H-2);
+}
+
+function renderPiDisplay(sim) {
+  const el = document.getElementById('piValue');
+  const badge = document.getElementById('digitBadge');
+  const s = fpToString(sim.piEstimate, 22);
+  const cd = sim.correctDigits;
+
+  document.getElementById('statDigits').textContent = cd;
+
+  if (!s.startsWith('3.') || s==='3.'+'0'.repeat(22)) {
+    el.innerHTML = '<span class="pending">3.???…</span>';
+    badge.textContent = '0 correct digits';
+    return;
+  }
+  let html='';
+  for (let i=0; i<s.length; i++) {
+    html += `<span class="${i<2+cd?'correct':'pending'}">${s[i]}</span>`;
+  }
+  html += `<span class="digit-badge">${cd} digit${cd!==1?'s':''}</span>`;
+  el.innerHTML = html;
+  badge.textContent = `${cd} correct digit${cd!==1?'s':''}`;
+}
+
+function renderTeamBars(sim) {
+  const container = document.getElementById('teamBarsContainer');
+  if (!container._built) {
+    container.innerHTML = sim.teams.map(team => `
+      <div class="team-row">
+        <div class="team-dot" style="background:${team.color}"></div>
+        <div class="team-name">${team.label}</div>
+        <div class="team-bar-wrap"><div class="team-bar-inner" id="tbar-fill-${team.id}" style="background:${team.color}"></div></div>
+        <div class="team-count" id="tbar-stats-${team.id}">—</div>
+      </div>`).join('');
+    container._built = true;
+
+    // Build formula strip
+    const strip = document.getElementById('formulaStrip');
+    strip.innerHTML = '<span style="color:var(--text-dim);margin-right:4px">π =</span>' +
+      sim.teams.map((t,i) => {
+        const op = i===0 ? '' : (t.sign===-1 ? '<span class="formula-op"> −</span>' : '<span class="formula-op"> +</span>');
+        return `${op}<span class="formula-term" style="color:${t.color};background:${t.color}18">${t.label.replace('−','')}</span>`;
+      }).join('');
+  }
+
+  let totalDone=0, totalTasks=0;
+  for (const team of sim.teams) {
+    const termsDone = team.tasks.filter(id=>id.endsWith('_scale')&&sim.tasks.get(id)?.state==='done').length;
+    totalDone += termsDone; totalTasks += team.numTerms;
+    const pct = (termsDone/team.numTerms*100).toFixed(0);
+    const fill = document.getElementById(`tbar-fill-${team.id}`);
+    const stats = document.getElementById(`tbar-stats-${team.id}`);
+    if (fill) fill.style.width=pct+'%';
+    if (stats) stats.textContent=`${termsDone}/${team.numTerms}`;
+  }
+  document.getElementById('statTasks').textContent = `${totalDone}/${totalTasks}`;
+  document.getElementById('statRechecks').textContent = recheckCount;
+
+  const active = SIM ? SIM.computers.filter(c=>c.state!=='idle').length : 0;
+  document.getElementById('statActive').textContent = active;
+
+  // floor badges
+  const qCount = SIM ? SIM.taskQueue.filter(id=>SIM.tasks.get(id)?.state==='queued').length : 0;
+  document.getElementById('floorWorkerBadge').textContent = active+' active';
+  document.getElementById('floorQueueBadge').textContent = qCount+' queued';
+}
+
+function renderEventLog(sim) {
+  const el = document.getElementById('eventLog');
+  el.innerHTML = sim.eventLog.slice(0,3).map(e=>
+    `<div class="event-entry ${e.type}">${e.msg}</div>`
+  ).join('');
+}
+
+// ============================================================
+// RAF LOOP
+// ============================================================
+let rafId=null, lastRenderTime=0;
+
+function frame(ts) {
+  if (!SIM||!SIM.running) return;
+  rafId = requestAnimationFrame(frame);
+  const realDt = SIM.lastFrameTime ? Math.min((ts-SIM.lastFrameTime)/1000,0.1) : 0.016;
+  SIM.lastFrameTime = ts;
+  simTick(SIM, realDt*SIM.speed);
+  renderFloor(SIM);
+  renderPiDisplay(SIM);
+  renderTeamBars(SIM);
+  if (ts-lastRenderTime>300) {
+    renderGraph(SIM);
+    renderEventLog(SIM);
+    lastRenderTime=ts;
+  }
+}
+
+// ============================================================
+// INTERACTION
+// ============================================================
+function onFloorClick(e) {
+  if (!SIM) return;
+  const rect = floorCanvas.getBoundingClientRect();
+  const scaleX = FLOOR_W / rect.width;
+  const mx = (e.clientX-rect.left)*scaleX;
+  const my = (e.clientY-rect.top)*scaleX;
+  let hit=null;
+  for (const comp of SIM.computers) {
+    const dx=comp.pos.x-mx, dy=comp.pos.y-my;
+    if (Math.sqrt(dx*dx+dy*dy)<12) { hit=comp; break; }
+  }
+  if (hit) { SIM.selectedCompId=hit.id; showTooltip(e,hit); }
+  else { SIM.selectedCompId=null; hideTooltip(); }
+}
+
+function onFloorHover(e) {
+  if (!SIM||SIM.selectedCompId===null) return;
+  const comp=SIM.computers[SIM.selectedCompId];
+  if (comp) updateTooltipContent(comp);
+  moveTooltip(e);
+}
+
+function showTooltip(e,comp) {
+  document.getElementById('compTooltip').style.display='block';
+  updateTooltipContent(comp);
+  moveTooltip(e);
+}
+
+function updateTooltipContent(comp) {
+  document.getElementById('tt-name').textContent=comp.name;
+  document.getElementById('tt-state').textContent=comp.state.replace(/_/g,' ');
+  const task=comp.currentTaskId&&SIM?SIM.tasks.get(comp.currentTaskId):null;
+  document.getElementById('tt-task').textContent=task?task.desc:'idle';
+  document.getElementById('tt-team').textContent=task&&SIM?SIM.teams[task.teamId].label:'—';
+  document.getElementById('tt-table').textContent=comp.tableSlot!==null?`×${comp.tableSlot+1}`:'—';
+  let pct=0;
+  if (comp.state==='computing'&&comp.totalComputeTime>0) {
+    pct=Math.round((1-comp.computeTimeLeft/comp.totalComputeTime)*100);
+    document.getElementById('tt-progress').textContent=pct+'%';
+  } else {
+    document.getElementById('tt-progress').textContent='—';
+  }
+  document.getElementById('tt-progress-fill').style.width=pct+'%';
+}
+
+function moveTooltip(e) {
+  const tt=document.getElementById('compTooltip');
+  const x=e.clientX+16, y=e.clientY-10;
+  tt.style.left=Math.min(x, window.innerWidth-240)+'px';
+  tt.style.top=Math.max(y, 10)+'px';
+}
+
+function hideTooltip() {
+  document.getElementById('compTooltip').style.display='none';
+}
+
+document.addEventListener('click', e=>{
+  if (!e.target.closest('#floorCanvas')) hideTooltip();
+});
+
+// ============================================================
+// CONTROLS
+// ============================================================
+function toggleSim() {
+  if (!SIM) initSim();
+  SIM.running=!SIM.running;
+  const btn=document.getElementById('startBtn');
+  if (SIM.running) {
+    btn.textContent='⏸ Pause';
+    SIM.lastFrameTime=null;
+    rafId=requestAnimationFrame(frame);
+  } else {
+    btn.textContent='▶ Run';
+    if (rafId) cancelAnimationFrame(rafId);
+  }
+}
+
+function resetSim() {
+  if (rafId) cancelAnimationFrame(rafId);
+  SIM=null;
+  document.getElementById('teamBarsContainer')._built=false;
+  initSim();
+  renderFloor(SIM);
+  renderPiDisplay(SIM);
+  renderGraph(SIM);
+  renderTeamBars(SIM);
+  renderEventLog(SIM);
+  document.getElementById('startBtn').textContent='▶ Run';
+}
+
+document.getElementById('speedSlider').addEventListener('input', e=>{
+  const v=parseInt(e.target.value);
+  document.getElementById('speedVal').textContent=v+'×';
+  if (SIM) SIM.speed=v;
+});
+
+function initSim() {
+  SIM=buildSim();
+  SIM.speed=parseInt(document.getElementById('speedSlider').value);
+  updateTaskQueue(SIM);
+  addEvent(SIM,'Simulation ready — click Run','info');
+}
+
+// ============================================================
+// STARTUP
+// ============================================================
+window.addEventListener('load', ()=>{
+  initCanvas();
+  initSim();
+  renderFloor(SIM);
+  renderPiDisplay(SIM);
+  renderGraph(SIM);
+  renderTeamBars(SIM);
+  renderEventLog(SIM);
+});
+</script>
+</body>
+</html>
