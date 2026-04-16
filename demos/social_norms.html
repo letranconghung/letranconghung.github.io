@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeGroot Social Norms</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0f1117;
+  color: #e0e0e0;
+  font-family: 'Georgia', serif;
+  min-height: 100vh;
+}
+h1 {
+  text-align: center;
+  padding: 16px 0 3px;
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  color: #c9b97a;
+}
+.subtitle {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 14px;
+}
+
+.outer {
+  display: flex;
+  gap: 12px;
+  padding: 0 14px 14px;
+  align-items: flex-start;
+}
+
+/* ── left controls ── */
+.left {
+  flex: 0 0 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── center ── */
+.center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── right ── */
+.right {
+  flex: 0 0 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: #181c27;
+  border: 1px solid #2a2f3e;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.card h3 {
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #c9b97a;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #2a2f3e;
+  padding-bottom: 5px;
+}
+
+/* sliders */
+.row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 9px;
+}
+.row:last-child { margin-bottom: 0; }
+.row-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.67rem;
+  margin-bottom: 3px;
+}
+.row-label span:first-child { color: #ccc; }
+.row-label span:last-child  { color: #c9b97a; font-variant-numeric: tabular-nums; }
+input[type=range] {
+  width: 100%;
+  accent-color: #c9b97a;
+  cursor: pointer;
+}
+
+/* buttons */
+.btn-row { display: flex; gap: 7px; margin-bottom: 8px; }
+button {
+  background: #2a2f3e;
+  color: #e0e0e0;
+  border: 1px solid #3a4050;
+  border-radius: 5px;
+  padding: 5px 13px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background 0.12s;
+}
+button:hover { background: #3a4050; }
+button.primary { background: #c9b97a; color: #111; border-color: #c9b97a; }
+button.primary:hover { background: #ddd08e; }
+
+/* stat boxes */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.stat-box {
+  background: #0f1117;
+  border-radius: 5px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.stat-box .val {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #c9b97a;
+  line-height: 1;
+}
+.stat-box .lbl {
+  font-size: 0.58rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+
+/* canvas */
+#townCanvas {
+  display: block;
+  border-radius: 8px;
+  border: 1px solid #2a2f3e;
+  background: #0a0c12;
+}
+
+canvas.chart {
+  display: block;
+  width: 100%;
+  background: #0f1117;
+  border-radius: 4px;
+}
+
+/* color bar */
+.colorbar {
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(to right,
+    hsl(240,80%,55%),
+    hsl(180,70%,50%),
+    hsl(120,60%,50%),
+    hsl(60,80%,55%),
+    hsl(0,80%,55%)
+  );
+  margin: 4px 0 2px;
+}
+.colorbar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.58rem;
+  color: #666;
+}
+
+/* regime badge */
+.regime {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-top: 6px;
+}
+.regime-contract { background: #1a3a2a; color: #66bb6a; border: 1px solid #2a5a3a; }
+.regime-noisy    { background: #3a2a10; color: #c9b97a; border: 1px solid #5a4a20; }
+.regime-random   { background: #3a1a1a; color: #ef5350; border: 1px solid #5a2a2a; }
+.regime-frozen   { background: #1a1a3a; color: #7986cb; border: 1px solid #2a2a5a; }
+
+.formula {
+  font-size: 0.62rem;
+  color: #555;
+  font-style: italic;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<h1>DEGROOT SOCIAL NORMS</h1>
+<p class="subtitle">x<sub>i</sub>(t+1) = α·x<sub>i</sub>(t) + (1−α)·avg<sub>neighbors</sub>(t) + σ·ε<sub>i</sub>(t)</p>
+
+<div class="outer">
+
+  <!-- LEFT -->
+  <div class="left">
+
+    <div class="card">
+      <h3>Simulation</h3>
+      <div class="btn-row">
+        <button class="primary" id="btnPlay">&#9654; Play</button>
+        <button id="btnReset">&#8635; Reset</button>
+      </div>
+      <div class="row">
+        <div class="row-label"><span>Speed (steps/frame)</span><span id="vSpeed">5</span></div>
+        <input type="range" id="sSpeed" min="1" max="200" value="5">
+      </div>
+      <div class="row">
+        <div class="row-label"><span>Population N</span><span id="vN">300</span></div>
+        <input type="range" id="sN" min="20" max="1000" value="300" step="10">
+      </div>
+      <div class="row">
+        <div class="row-label"><span>Neighbors k</span><span id="vK">6</span></div>
+        <input type="range" id="sK" min="1" max="30" value="6" step="1">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Parameters</h3>
+
+      <div class="row">
+        <div class="row-label">
+          <span>Self-weight α</span>
+          <span id="vAlpha">0.50</span>
+        </div>
+        <input type="range" id="sAlpha" min="0" max="1" value="0.5" step="0.01">
+      </div>
+
+      <div class="row">
+        <div class="row-label">
+          <span>Noise σ</span>
+          <span id="vSigma">0.00</span>
+        </div>
+        <input type="range" id="sSigma" min="0" max="0.5" value="0.00" step="0.005">
+      </div>
+
+      <div style="margin-top:4px;">
+        <div style="font-size:0.62rem; color:#888; margin-bottom:4px;">Presets</div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px;">
+          <button id="pContract" style="font-size:0.62rem; padding:3px 7px;">Contracting</button>
+          <button id="pNoisy"    style="font-size:0.62rem; padding:3px 7px;">Noisy norm</button>
+          <button id="pRandom"   style="font-size:0.62rem; padding:3px 7px;">Random walk</button>
+          <button id="pFrozen"   style="font-size:0.62rem; padding:3px 7px;">Frozen</button>
+        </div>
+      </div>
+
+      <div id="regimeBadge" class="regime regime-contract">Contracting</div>
+
+      <div class="formula">
+        Steady-state σ²_∞ ≈ σ²/(1−α²)<br>
+        Convergence rate ≈ α·|λ₂(W)|
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Opinion color</h3>
+      <div class="colorbar"></div>
+      <div class="colorbar-labels"><span>0</span><span>0.5</span><span>1</span></div>
+      <div style="font-size:0.62rem; color:#555; margin-top:6px; font-style:italic;">
+        Blue = 0 (norm A)<br>
+        Red  = 1 (norm B)
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Theory</h3>
+      <div style="font-size:0.63rem; color:#888; line-height:1.65;">
+        <b style="color:#c9b97a;">Banach Fixed Point:</b> if α &lt; 1 and σ=0, the map is a contraction — opinions converge to a unique fixed point regardless of initial conditions.<br><br>
+        <b style="color:#ef5350;">Random walk:</b> α=1 removes the restoring force. Noise drives opinions on an unbounded random walk — no social law emerges.<br><br>
+        <b style="color:#c9b97a;">Noisy norm:</b> the middle ground. Variance stabilizes at σ²/(1−α²), a finite steady state — a <em>statistical</em> social law.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <canvas id="townCanvas"></canvas>
+
+    <div class="card">
+      <h3>Opinion distribution over time  <span style="font-size:0.6rem; color:#555;">(each column = one timestep)</span></h3>
+      <canvas id="distCanvas" class="chart" height="90"></canvas>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+
+    <div class="card">
+      <h3>Census</h3>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="val" id="cStep">0</div><div class="lbl">Step</div></div>
+        <div class="stat-box"><div class="val" id="cAlive">—</div><div class="lbl">Agents</div></div>
+        <div class="stat-box"><div class="val" id="cMean">—</div><div class="lbl">Mean x</div></div>
+        <div class="stat-box"><div class="val" id="cVar">—</div><div class="lbl">Variance</div></div>
+        <div class="stat-box"><div class="val" id="cMin">—</div><div class="lbl">Min x</div></div>
+        <div class="stat-box"><div class="val" id="cMax">—</div><div class="lbl">Max x</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Mean opinion  <span style="font-size:0.6rem;color:#555;">over time</span></h3>
+      <canvas id="meanChart" class="chart" height="90"></canvas>
+    </div>
+
+    <div class="card">
+      <h3>Variance  <span style="font-size:0.6rem;color:#555;">over time</span></h3>
+      <canvas id="varChart" class="chart" height="90"></canvas>
+      <div style="font-size:0.6rem; color:#555; margin-top:4px; font-style:italic;" id="varTheory"></div>
+    </div>
+
+    <div class="card">
+      <h3>Opinion histogram  <span style="font-size:0.6rem;color:#555;">current step</span></h3>
+      <canvas id="histCanvas" class="chart" height="110"></canvas>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ── state ──────────────────────────────────────────────────────
+let opinions = [];   // Float64Array of length N
+let neighbors = [];  // array of Int32Array per agent
+let step = 0;
+let running = false;
+let raf = null;
+
+// history (capped)
+const HIST_LEN = 600;
+let meanHistory = [];
+let varHistory  = [];
+
+// ── canvas refs ────────────────────────────────────────────────
+const townC  = document.getElementById('townCanvas');
+const distC  = document.getElementById('distCanvas');
+const meanC  = document.getElementById('meanChart');
+const varC   = document.getElementById('varChart');
+const histC  = document.getElementById('histCanvas');
+
+// agent positions (fixed layout, random scattered)
+let positions = [];  // [{x,y}]
+
+// ── sizing ─────────────────────────────────────────────────────
+function resize() {
+  const centerW = document.querySelector('.center').offsetWidth;
+  const H = Math.min(Math.max(centerW * 0.75, 320), 560);
+  townC.width  = centerW;
+  townC.height = H;
+
+  distC.width  = distC.parentElement.offsetWidth - 24;
+  meanC.width  = meanC.parentElement.offsetWidth - 24;
+  varC.width   = varC.parentElement.offsetWidth  - 24;
+  histC.width  = histC.parentElement.offsetWidth - 24;
+}
+window.addEventListener('resize', () => { resize(); renderAll(); });
+
+// ── params ─────────────────────────────────────────────────────
+function P() {
+  return {
+    N:     +document.getElementById('sN').value,
+    k:     +document.getElementById('sK').value,
+    alpha: +document.getElementById('sAlpha').value,
+    sigma: +document.getElementById('sSigma').value,
+    speed: +document.getElementById('sSpeed').value,
+  };
+}
+
+// ── gaussian noise ─────────────────────────────────────────────
+function randn() {
+  let u=0,v=0;
+  while(!u) u=Math.random();
+  while(!v) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+// ── opinion → color (blue=0 → red=1 via hue) ──────────────────
+function opinionColor(x) {
+  // hue: 240 (blue) at x=0, 0/360 (red) at x=1
+  const hue = 240 - x * 240;
+  return `hsl(${hue},80%,58%)`;
+}
+function opinionColorRGB(x) {
+  // returns [r,g,b] 0-255 for imageData
+  const hue = (240 - x * 240) / 360;
+  return hslToRgb(hue, 0.8, 0.58);
+}
+function hslToRgb(h,s,l) {
+  let r,g,b;
+  if(s===0){r=g=b=l;}
+  else{
+    const hue2rgb=(p,q,t)=>{
+      if(t<0)t+=1; if(t>1)t-=1;
+      if(t<1/6)return p+(q-p)*6*t;
+      if(t<1/2)return q;
+      if(t<2/3)return p+(q-p)*(2/3-t)*6;
+      return p;
+    };
+    const q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+    r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+  }
+  return [Math.round(r*255),Math.round(g*255),Math.round(b*255)];
+}
+
+// ── build random geometric neighbor graph ──────────────────────
+function buildNeighbors(N, k, W, H) {
+  // for each agent, find k nearest by Euclidean distance
+  neighbors = [];
+  for (let i = 0; i < N; i++) {
+    const xi = positions[i].x, yi = positions[i].y;
+    // compute distances to all others
+    const dists = [];
+    for (let j = 0; j < N; j++) {
+      if (j === i) continue;
+      const dx = xi - positions[j].x, dy = yi - positions[j].y;
+      dists.push({ j, d: dx*dx + dy*dy });
+    }
+    dists.sort((a,b) => a.d - b.d);
+    const kk = Math.min(k, N-1);
+    neighbors.push(new Int32Array(dists.slice(0, kk).map(d => d.j)));
+  }
+}
+
+// ── init ───────────────────────────────────────────────────────
+function init() {
+  step = 0;
+  meanHistory = [];
+  varHistory  = [];
+
+  const { N, k } = P();
+  const W = townC.width, H = townC.height;
+
+  // scatter positions
+  positions = [];
+  for (let i = 0; i < N; i++) {
+    positions.push({ x: 8 + Math.random() * (W-16), y: 8 + Math.random() * (H-16) });
+  }
+
+  // random initial opinions
+  opinions = new Float64Array(N);
+  for (let i = 0; i < N; i++) opinions[i] = Math.random();
+
+  buildNeighbors(N, k, W, H);
+  recordHistory();
+  renderAll();
+  updateStats();
+  updateRegimeBadge();
+}
+
+// ── one discrete timestep ──────────────────────────────────────
+function tick() {
+  const { alpha, sigma } = P();
+  const N = opinions.length;
+  const next = new Float64Array(N);
+
+  for (let i = 0; i < N; i++) {
+    const nbrs = neighbors[i];
+    const kk = nbrs.length;
+    let avg = 0;
+    if (kk > 0) {
+      for (let j = 0; j < kk; j++) avg += opinions[nbrs[j]];
+      avg /= kk;
+    } else {
+      avg = opinions[i];
+    }
+    let xi = alpha * opinions[i] + (1 - alpha) * avg;
+    if (sigma > 0) xi += sigma * randn();
+    // clamp to [0,1] — optional, can remove for unbounded random walk
+    // we keep it unclamped so variance can grow visibly, but mirror at boundary
+    next[i] = xi;
+  }
+  opinions = next;
+  step++;
+  recordHistory();
+}
+
+function recordHistory() {
+  const N = opinions.length;
+  let sum = 0, sum2 = 0;
+  for (let i = 0; i < N; i++) { sum += opinions[i]; sum2 += opinions[i]*opinions[i]; }
+  const mean = sum / N;
+  const variance = sum2/N - mean*mean;
+  meanHistory.push(mean);
+  varHistory.push(variance);
+  if (meanHistory.length > HIST_LEN) { meanHistory.shift(); varHistory.shift(); }
+}
+
+// ── stats display ──────────────────────────────────────────────
+function updateStats() {
+  const N = opinions.length;
+  let sum=0, sum2=0, mn=Infinity, mx=-Infinity;
+  for (let i=0;i<N;i++){
+    sum+=opinions[i]; sum2+=opinions[i]*opinions[i];
+    if(opinions[i]<mn)mn=opinions[i];
+    if(opinions[i]>mx)mx=opinions[i];
+  }
+  const mean=sum/N, variance=sum2/N-mean*mean;
+  document.getElementById('cStep').textContent = step;
+  document.getElementById('cAlive').textContent = N;
+  document.getElementById('cMean').textContent  = mean.toFixed(3);
+  document.getElementById('cVar').textContent   = variance.toFixed(4);
+  document.getElementById('cMin').textContent   = mn.toFixed(3);
+  document.getElementById('cMax').textContent   = mx.toFixed(3);
+
+  // theoretical steady-state variance
+  const { alpha, sigma } = P();
+  let theory = '';
+  if (sigma > 0 && alpha < 1) {
+    const ss = (sigma*sigma) / (1 - alpha*alpha);
+    theory = `Theory: σ²_∞ ≈ ${ss.toFixed(4)}`;
+  } else if (alpha >= 1) {
+    theory = 'α=1: variance grows without bound';
+  } else {
+    theory = 'σ=0, α<1: variance → 0';
+  }
+  document.getElementById('varTheory').textContent = theory;
+}
+
+function updateRegimeBadge() {
+  const { alpha, sigma } = P();
+  const badge = document.getElementById('regimeBadge');
+  badge.className = 'regime';
+  if (alpha >= 0.999 && sigma < 0.01) {
+    badge.classList.add('regime-frozen'); badge.textContent = 'Frozen (α=1, σ≈0)';
+  } else if (alpha >= 0.999) {
+    badge.classList.add('regime-random'); badge.textContent = 'Random walk (α=1)';
+  } else if (sigma > 0.05) {
+    badge.classList.add('regime-noisy'); badge.textContent = 'Noisy norm';
+  } else {
+    badge.classList.add('regime-contract'); badge.textContent = 'Contracting → consensus';
+  }
+}
+
+// ── render town ────────────────────────────────────────────────
+function renderTown() {
+  const ctx = townC.getContext('2d');
+  const W = townC.width, H = townC.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // subtle grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  ctx.lineWidth = 1;
+  for (let x=40;x<W;x+=40){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for (let y=40;y<H;y+=40){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+
+  const N = opinions.length;
+  const r = N > 500 ? 3 : N > 200 ? 4 : 5;
+
+  for (let i = 0; i < N; i++) {
+    ctx.beginPath();
+    ctx.arc(positions[i].x, positions[i].y, r, 0, Math.PI*2);
+    ctx.fillStyle = opinionColor(opinions[i]);
+    ctx.fill();
+  }
+}
+
+// ── render distribution waterfall ─────────────────────────────
+// each column = one timestep, rows = opinion buckets, color = density
+function renderDist() {
+  const ctx = distC.getContext('2d');
+  const W = distC.width, H = distC.height;
+  ctx.clearRect(0,0,W,H);
+
+  if (!distSnapshots || distSnapshots.length === 0) return;
+
+  const BINS = 40;
+  const nSnap = distSnapshots.length;
+  const sw = Math.max(1, W / nSnap);
+
+  // compute global [lo, hi] across all snapshots so the y-axis is stable
+  let lo = Infinity, hi = -Infinity;
+  for (const snap of distSnapshots) {
+    for (let i = 0; i < snap.length; i++) {
+      if (snap[i] < lo) lo = snap[i];
+      if (snap[i] > hi) hi = snap[i];
+    }
+  }
+  // pad slightly and ensure minimum range
+  const range = Math.max(hi - lo, 0.01);
+  lo -= range * 0.05;
+  hi += range * 0.05;
+  const totalRange = hi - lo;
+
+  for (let s = 0; s < nSnap; s++) {
+    const snap = distSnapshots[s];
+    const bins = new Float32Array(BINS);
+    for (let i = 0; i < snap.length; i++) {
+      const b = Math.floor(((snap[i] - lo) / totalRange) * BINS);
+      const bc = Math.max(0, Math.min(BINS - 1, b));
+      bins[bc]++;
+    }
+    const maxBin = Math.max(...bins, 1);
+    for (let b = 0; b < BINS; b++) {
+      const density = bins[b] / maxBin;
+      if (density < 0.01) continue;
+      const x = s * sw;
+      // b=0 is lo (bottom of chart), b=BINS-1 is hi (top)
+      const y = H - ((b + 1) / BINS) * H;
+      const bh = H / BINS + 1; // +1 avoids gaps
+      // opinion value this bin represents → hue
+      const opinion = lo + ((b + 0.5) / BINS) * totalRange;
+      const t = Math.max(0, Math.min(1, (opinion - 0) / 1)); // normalize to [0,1] for color
+      const hue = 240 - t * 240;
+      ctx.fillStyle = `hsla(${hue},80%,58%,${density.toFixed(2)})`;
+      ctx.fillRect(x, y, Math.ceil(sw) + 1, Math.ceil(bh));
+    }
+  }
+
+  // axis labels
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '9px sans-serif';
+  ctx.fillText(hi.toFixed(2), 2, 10);
+  ctx.fillText(lo.toFixed(2), 2, H - 3);
+  ctx.fillText(`t=${step}`, W - 34, H - 3);
+}
+
+// ── render line chart ──────────────────────────────────────────
+function renderLineChart(canvas, data, color, label, minY, maxY) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  if (data.length < 2) return;
+
+  // auto range if not provided
+  if (minY === undefined) minY = Math.min(...data);
+  if (maxY === undefined) maxY = Math.max(...data);
+  if (maxY <= minY) maxY = minY + 0.001;
+
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=H-(i/4)*H;
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='8px sans-serif';
+    const v=minY+(i/4)*(maxY-minY);
+    ctx.fillText(v.toFixed(3),2,y-1);
+  }
+
+  ctx.beginPath();
+  const n=data.length;
+  for(let i=0;i<n;i++){
+    const x=(i/(n-1))*W;
+    const y=H-((data[i]-minY)/(maxY-minY))*H;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
+}
+
+// ── histogram ──────────────────────────────────────────────────
+function renderHistogram() {
+  const ctx = histC.getContext('2d');
+  const W = histC.width, H = histC.height;
+  ctx.clearRect(0,0,W,H);
+
+  const BINS = 30;
+  const bins = new Array(BINS).fill(0);
+  const N = opinions.length;
+  let mn=Infinity, mx=-Infinity;
+  for(let i=0;i<N;i++){
+    if(opinions[i]<mn)mn=opinions[i];
+    if(opinions[i]>mx)mx=opinions[i];
+  }
+  // use fixed [0,1] range for consistency unless opinions escape
+  const lo = Math.min(0, mn), hi = Math.max(1, mx);
+  const range = hi - lo || 1;
+
+  for(let i=0;i<N;i++){
+    const b=Math.min(BINS-1,Math.floor(((opinions[i]-lo)/range)*BINS));
+    if(b>=0) bins[b]++;
+  }
+  const maxB=Math.max(...bins,1);
+  const bw=W/BINS;
+  for(let b=0;b<BINS;b++){
+    const bh=(bins[b]/maxB)*(H-14);
+    const x=b*bw;
+    const hue=240-((b/BINS))*240;
+    ctx.fillStyle=`hsl(${hue},80%,55%)`;
+    ctx.fillRect(x,H-bh-14,bw-1,bh);
+  }
+  // x axis labels
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='8px sans-serif';
+  ctx.fillText(lo.toFixed(1),2,H-2);
+  ctx.fillText(((lo+hi)/2).toFixed(1),W/2-8,H-2);
+  ctx.fillText(hi.toFixed(1),W-20,H-2);
+}
+
+function renderAll() {
+  renderTown();
+  renderDist();
+  renderLineChart(meanC, meanHistory, '#c9b97a', 'mean', 0, 1);
+  renderLineChart(varC,  varHistory,  '#ef5350', 'var');
+  renderHistogram();
+  updateStats();
+}
+
+// ── distribution snapshots (sampled) ──────────────────────────
+let distSnapshots = [];
+const MAX_SNAPS = 300;
+
+function maybeSaveSnapshot() {
+  // save every step but keep only MAX_SNAPS
+  distSnapshots.push(opinions.slice());
+  if (distSnapshots.length > MAX_SNAPS) distSnapshots.shift();
+}
+
+// ── game loop ──────────────────────────────────────────────────
+function loop() {
+  if (!running) return;
+  const spf = +document.getElementById('sSpeed').value;
+  for (let i = 0; i < spf; i++) tick();
+  // save one snapshot per frame so waterfall always spans full history width
+  maybeSaveSnapshot();
+  renderAll();
+  updateRegimeBadge();
+  raf = requestAnimationFrame(loop);
+}
+
+// ── controls ───────────────────────────────────────────────────
+const btnPlay = document.getElementById('btnPlay');
+btnPlay.addEventListener('click', () => {
+  running = !running;
+  if (running) {
+    btnPlay.textContent = '⏸ Pause';
+    raf = requestAnimationFrame(loop);
+  } else {
+    btnPlay.textContent = '▶ Play';
+    cancelAnimationFrame(raf);
+  }
+});
+document.getElementById('btnReset').addEventListener('click', () => {
+  running = false; cancelAnimationFrame(raf);
+  btnPlay.textContent = '▶ Play';
+  distSnapshots = [];
+  resize(); init();
+});
+
+// sliders
+const sliders = [
+  ['sSpeed','vSpeed', v=>v],
+  ['sN',    'vN',     v=>v],
+  ['sK',    'vK',     v=>v],
+  ['sAlpha','vAlpha', v=>parseFloat(v).toFixed(2)],
+  ['sSigma','vSigma', v=>parseFloat(v).toFixed(3)],
+];
+for (const [id, vid, fmt] of sliders) {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(vid).textContent = fmt(this.value);
+    updateRegimeBadge();
+    // if N or k changed, rebuild on next reset only
+  });
+}
+
+// presets
+function setPreset(alpha, sigma) {
+  document.getElementById('sAlpha').value = alpha;
+  document.getElementById('sSigma').value = sigma;
+  document.getElementById('vAlpha').textContent = alpha.toFixed(2);
+  document.getElementById('vSigma').textContent = sigma.toFixed(3);
+  updateRegimeBadge();
+}
+document.getElementById('pContract').addEventListener('click', () => setPreset(0.50, 0.00));
+document.getElementById('pNoisy')   .addEventListener('click', () => setPreset(0.70, 0.05));
+document.getElementById('pRandom')  .addEventListener('click', () => setPreset(1.00, 0.05));
+document.getElementById('pFrozen')  .addEventListener('click', () => setPreset(1.00, 0.00));
+
+// ── boot ───────────────────────────────────────────────────────
+resize();
+init();
+</script>
+</body>
+</html>
