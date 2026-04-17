@@ -3,5 +3,8 @@ main:
     url: /math/
   - title: "ML"
     url: /ml/
-
+  - title: "Writing"
+    url: /writing/
+  - title: "Updates"
+    url: /updates/
   
