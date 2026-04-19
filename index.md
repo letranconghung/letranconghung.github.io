@@ -3,7 +3,7 @@ layout: single
 author_profile: true
 title: "Home"
 ---
-Hi, I'm Hung, a fourth year Math major at the University of Chicago. I'm currently interested in the theory of deep learning! My thoughts are recently inspired by, in no order:
+Hi, I'm Hung, a fourth year Math major at the University of Chicago. I'm currently interested in the theory of deep learning, as inspired by:
 - [Misha Belkin's](http://misha.belkin-wang.org/) blog posts on the necessity of developing a deep learning theory.
 - [Rebecca Willett's](https://willett.psd.uchicago.edu/research/) motivation for her research directions.
 - The book [*The Principles of Deep Learning Theory*](https://deeplearningtheory.com/).
