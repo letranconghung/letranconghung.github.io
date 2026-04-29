@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Technological Attitude Indicator — eight ways to live with the machine.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bone:        #f4efe6;
+    --bone-2:      #ece6da;
+    --bone-3:      #e2dccf;
+    --ink:         #1a1a1c;
+    --ink-2:       #3a3a3e;
+    --ink-3:       #6f6e6a;
+    --ink-4:       #a09c93;
+    --rule:        #d6cfc0;
+    --amber:       #c8842a;
+    --amber-soft:  #e0a957;
+    --warn:        #b94d3b;
+    --teal:        #2a8c84;
+    --plum:        #6a3a6e;
+    --shadow:      rgba(20, 18, 14, 0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bone);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  section {
+    position: relative;
+    padding: 100px 8vw;
+    max-width: 1100px;
+    margin: 0 auto;
+    z-index: 2;
+  }
+
+  h1, h2, h3, .serif {
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+  p {
+    color: var(--ink-2);
+    max-width: 60ch;
+  }
+
+  em { font-style: italic; }
+  strong { font-weight: 600; color: var(--ink); }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 24px;
+    display: inline-block;
+  }
+
+  /* ──────────────────────────────────── HERO */
+  #hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 5.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    max-width: 22ch;
+    margin-bottom: 32px;
+  }
+  .hero-title em { color: var(--amber); }
+  .hero-lede {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+    color: var(--ink-2);
+    max-width: 56ch;
+    margin-bottom: 16px;
+    line-height: 1.55;
+  }
+  .hero-lede.small { font-size: 1.02rem; color: var(--ink-3); }
+
+  /* axis legend */
+  .axes {
+    margin: 56px 0 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 920px;
+  }
+  .axis {
+    border: 1px solid var(--rule);
+    background: var(--bone-2);
+    border-radius: 10px;
+    padding: 22px 22px 20px;
+  }
+  .axis .glyph {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+  .axis .glyph .a { color: var(--amber); font-weight: 700; }
+  .axis .glyph .b { color: var(--teal); font-weight: 700; }
+  .axis .glyph .slash { color: var(--ink-3); margin: 0 8px; font-weight: 300; }
+  .axis .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 12px;
+  }
+  .axis .pole {
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .axis .pole strong.a { color: var(--amber); }
+  .axis .pole strong.b { color: var(--teal); }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 26px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--bone);
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s, color 0.2s;
+  }
+  .hero-cta:hover { transform: translateY(-2px); }
+  .hero-cta:active { transform: translateY(0); }
+  .hero-meta {
+    margin-top: 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* ──────────────────────────────────── QUIZ */
+  #quiz {
+    background: var(--bone-2);
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 90px 8vw;
+    display: none;
+  }
+  #quiz.is-active { display: block; }
+  .quiz-inner { max-width: 820px; margin: 0 auto; }
+
+  .progress-rail {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 36px;
+  }
+  .progress-tick {
+    flex: 1;
+    height: 3px;
+    background: var(--rule);
+    border-radius: 999px;
+    transition: background 0.3s;
+  }
+  .progress-tick.is-done { background: var(--ink); }
+  .progress-tick.is-current { background: var(--amber); }
+
+  .q-card {
+    background: var(--bone);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 44px;
+    box-shadow: 0 18px 40px var(--shadow);
+  }
+  .q-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 16px;
+  }
+  .q-prompt {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    line-height: 1.25;
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .q-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-3);
+    font-size: 1.05rem;
+    margin-bottom: 32px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--bone-2);
+    border: 1.5px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px 22px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    color: var(--ink);
+    line-height: 1.45;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .option:hover {
+    background: var(--bone);
+    border-color: var(--ink-3);
+  }
+  .option:active { transform: scale(0.995); }
+  .option.is-selected {
+    background: var(--bone);
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .option .opt-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+  }
+  .option .opt-text { display: block; }
+
+  .quiz-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+  }
+  .quiz-btn {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .quiz-btn:hover { background: var(--ink); color: var(--bone); }
+  .quiz-btn:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .keyhint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+  .keyhint kbd {
+    background: var(--bone);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: 0 2px;
+    font-size: 0.66rem;
+  }
+
+  /* ──────────────────────────────────── RESULT */
+  #result {
+    display: none;
+    background: var(--bone);
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 100px 8vw 80px;
+  }
+  #result.is-active { display: block; }
+  .result-inner { max-width: 920px; margin: 0 auto; }
+
+  .result-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 18px;
+  }
+  .result-code {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(4.5rem, 16vw, 12rem);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .result-code .a { color: var(--amber); }
+  .result-code .b { color: var(--teal); }
+  .result-code .c { color: var(--plum); }
+
+  .result-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+    color: var(--ink-2);
+    margin-bottom: 36px;
+    font-weight: 400;
+    max-width: 28ch;
+  }
+
+  .result-desc {
+    font-family: 'Fraunces', serif;
+    font-size: 1.18rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+    max-width: 60ch;
+    margin-bottom: 16px;
+  }
+
+  .axis-readout {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 820px;
+  }
+  .axis-cell {
+    background: var(--bone-2);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .axis-cell .nm {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+  .axis-cell .meter {
+    height: 4px;
+    background: var(--rule);
+    border-radius: 999px;
+    position: relative;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+  .axis-cell .meter-fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--amber) 0%, var(--rule) 50%, var(--teal) 100%);
+    opacity: 0.35;
+  }
+  .axis-cell .marker {
+    position: absolute;
+    top: -4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--ink);
+    transform: translateX(-50%);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .axis-cell .pole-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+  }
+  .axis-cell .pole-row .lit { color: var(--ink); font-weight: 600; }
+
+  /* the recommendation panel */
+  .reco {
+    margin-top: 60px;
+    background: var(--ink);
+    color: var(--bone);
+    border-radius: 16px;
+    padding: 48px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.18);
+  }
+  .reco .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber-soft);
+    margin-bottom: 20px;
+  }
+  .reco h3 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 500;
+    color: var(--bone);
+    margin-bottom: 14px;
+    line-height: 1.15;
+  }
+  .reco h3 em { color: var(--amber-soft); font-style: italic; }
+  .reco .pitch {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: #c5c1b6;
+    font-size: 1.15rem;
+    margin-bottom: 24px;
+  }
+  .reco p {
+    color: #c5c1b6;
+    font-size: 1rem;
+    margin-bottom: 14px;
+    max-width: 60ch;
+  }
+  .reco .why {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid #2e2e30;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    color: #8a8780;
+    text-transform: uppercase;
+  }
+  .reco .why .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #2e2e30;
+  }
+  .reco .why .row:last-child { border-bottom: none; }
+  .reco .why .v { color: var(--bone); }
+
+  .result-actions {
+    margin-top: 40px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .result-actions button {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .result-actions button:hover { background: var(--ink); color: var(--bone); }
+
+  .all-types {
+    margin-top: 70px;
+    padding-top: 50px;
+    border-top: 1px solid var(--rule);
+  }
+  .all-types h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 24px;
+  }
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .type-pill {
+    background: var(--bone-2);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-2);
+  }
+  .type-pill .code {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    color: var(--ink);
+    letter-spacing: 0.08em;
+    margin-right: 10px;
+    font-weight: 600;
+  }
+  .type-pill.you {
+    background: var(--ink);
+    color: var(--bone);
+    border-color: var(--ink);
+  }
+  .type-pill.you .code { color: var(--amber-soft); }
+
+  /* ──────────────────────────────────── REFLECTION */
+  #reflection {
+    background: var(--bone-2);
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 100px 8vw;
+  }
+  .reflection-inner { max-width: 720px; margin: 0 auto; }
+  .reflection-inner .who {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 26px;
+  }
+  .reflection-inner h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+  .reflection-inner p {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--ink-2);
+    line-height: 1.65;
+    margin-bottom: 18px;
+    max-width: 64ch;
+  }
+
+  /* ──────────────────────────────────── COLOPHON */
+  #colophon {
+    padding: 36px 8vw 50px;
+    text-align: center;
+    color: var(--ink-3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border-top: 1px solid var(--rule);
+    background: var(--bone);
+  }
+
+  /* ──────────────────────────────────── RESPONSIVE */
+  @media (max-width: 800px) {
+    section { padding: 70px 6vw; }
+    #quiz, #result, #reflection { padding: 70px 6vw; }
+    .axes { grid-template-columns: 1fr; }
+    .axis-readout { grid-template-columns: 1fr; }
+    .q-card { padding: 28px; }
+    .reco { padding: 30px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ───────────────────── HERO / INTRO ───────────────────── -->
+<section id="hero">
+  <div class="eyebrow">A Technological Attitude Indicator · 8 questions · ~3 min</div>
+
+  <h1 class="hero-title">Le-Myers-Briggs: How much <em>technology</em><br>do you actually want<br>in your life?</h1>
+
+  <p class="hero-lede">Most of us never decide. We just adopt. The phone arrived; we keep it. The cloud arrived; we use it. AI arrived; we'll see. This questionnaire forces a small deliberation. It asks how present technology should be in your day, how much of life you want recorded, and how much you trust generative AI to do the thinking.</p>
+
+  <p class="hero-lede small">Three axes. Eight types. A three-letter code at the end (like 16 Personalities, but smaller and more honest about itself), plus a recommendation that ranges from <em>"buy a dumb phone and a notebook"</em> to <em>"go all-in on an always-on agent."</em> It is opinionated. It is not selling you anything.</p>
+
+  <button class="hero-cta" id="startBtn">Begin the questionnaire <span>→</span></button>
+  <div class="hero-meta">8 questions · no signup · nothing stored</div>
+</section>
+
+
+<!-- ───────────────────── QUIZ ───────────────────── -->
+<section id="quiz">
+  <div class="quiz-inner">
+    <div class="progress-rail" id="progressRail"></div>
+
+    <div class="q-card">
+      <div class="q-num" id="qNum">Question 1 of 8</div>
+      <h2 class="q-prompt" id="qPrompt"></h2>
+      <p class="q-sub" id="qSub"></p>
+      <div class="options" id="options"></div>
+    </div>
+
+    <div class="quiz-controls">
+      <button class="quiz-btn" id="prevBtn">← Back</button>
+      <div class="keyhint">Keys <kbd>1</kbd>–<kbd>4</kbd> · <kbd>←</kbd> back</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ───────────────────── RESULT ───────────────────── -->
+<section id="result">
+  <div class="result-inner">
+    <div class="result-eyebrow" id="resultEyebrow">Your type</div>
+    <div class="result-code" id="resultCode">···</div>
+    <div class="result-name" id="resultName"></div>
+    <p class="result-desc" id="resultDesc"></p>
+
+    <div class="axis-readout" id="axisReadout"></div>
+
+    <div class="reco" id="reco"></div>
+
+    <div class="result-actions">
+      <button id="restartBtn">Take it again</button>
+      <button id="copyBtn">Copy your type</button>
+    </div>
+
+    <div class="all-types">
+      <h4>All eight types</h4>
+      <div class="types-grid" id="typesGrid"></div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+(function () {
+
+  // ─────────────────────────────────────────── DATA: questions
+  // Each option scores some axes. Axes:
+  //   Axis I:  A (ambient)  vs  R (reach)
+  //   Axis II: C (capture)  vs  L (live)
+  //   Axis III:G (generate) vs  H (human)
+  //
+  // Score ranges -2..+2 along each axis. Positive number leans first letter
+  // (A, C, G); negative leans second (R, L, H).
+
+  const QUESTIONS = [
+    {
+      prompt: "It's 7:14 a.m. on a Tuesday. The first thing technology does in your day is —",
+      sub: "The opening minute of the day says a lot about what role you've given the machine.",
+      opts: [
+        { text: "Wake me up via my phone, then immediately scroll for ten minutes. The day starts on the feed.",                          score: { I: +2, II: +1, III:  0 } },
+        { text: "An assistant briefs me — calendar, weather, top emails — while I'm still in bed.",                                       score: { I: +2, II:  0, III: +2 } },
+        { text: "A simple alarm. After that, nothing for a while. Coffee, window, paper.",                                                score: { I: -2, II: -1, III: -1 } },
+        { text: "Voice memo a dream or an idea before it's gone. Then go back to the day.",                                               score: { I:  0, II: +2, III: -1 } },
+      ],
+    },
+
+    {
+      prompt: "You're at dinner with someone you love. Your phone is —",
+      sub: "The most-asked question of the modern table.",
+      opts: [
+        { text: "Out, face-up. I might check it. I might post a photo. The world is a thing I'm partly in.",                              score: { I: +2, II: +2, III:  0 } },
+        { text: "On the table face-down. I'd never use it, but it's there.",                                                              score: { I: +1, II:  0, III:  0 } },
+        { text: "In a pocket or bag. I'll glance at it if there's a real reason.",                                                        score: { I:  0, II:  0, III:  0 } },
+        { text: "Off, or in another room entirely. Dinner is dinner.",                                                                    score: { I: -2, II: -2, III: -1 } },
+      ],
+    },
+
+    {
+      prompt: "You're stuck on a hard problem at work. Your first move is —",
+      sub: "When thought slows, who picks up the pen?",
+      opts: [
+        { text: "Open Claude or ChatGPT. Ask it to draft three solutions. Pick the best one.",                                            score: { I: +1, II:  0, III: +2 } },
+        { text: "Open Claude or ChatGPT — but only to ask it the right question back. I keep the pen.",                                   score: { I:  0, II:  0, III:  0 } },
+        { text: "Pull up notes, old documents, things I've already written. Search my own archive.",                                      score: { I: +1, II: +2, III: -1 } },
+        { text: "Close the laptop. Walk. Whiteboard. Talk it out with a colleague.",                                                      score: { I: -2, II: -1, III: -2 } },
+      ],
+    },
+
+    {
+      prompt: "You're somewhere beautiful — a sunset, a city, a quiet room. You —",
+      sub: "Is the moment a moment, or a draft of an artifact?",
+      opts: [
+        { text: "Take 20 photos. A few videos. Maybe a panorama. Future-me will thank me.",                                               score: { I: +1, II: +2, III:  0 } },
+        { text: "Take one good photo, then put the phone away.",                                                                          score: { I:  0, II: +1, III:  0 } },
+        { text: "Look. Just look. Maybe write about it later.",                                                                           score: { I: -1, II: -1, III:  0 } },
+        { text: "Notice that I want to take a photo, decide not to, and try to remember it instead.",                                     score: { I: -2, II: -2, III: -1 } },
+      ],
+    },
+
+    {
+      prompt: "Picture your ideal interface for asking a question — anything, anywhere.",
+      sub: "Where do you want the body to meet the machine?",
+      opts: [
+        { text: "Voice. I speak; an earbud or a glasses-mounted assistant answers. Hands-free, eyes-free.",                               score: { I: +2, II:  0, III: +1 } },
+        { text: "A wrist or palm — a small ambient screen I can glance at without breaking from the world.",                              score: { I: +1, II:  0, III:  0 } },
+        { text: "A laptop or phone, deliberately opened. The opening is part of the gesture.",                                            score: { I: -1, II:  0, III:  0 } },
+        { text: "A book, a person, a notebook. Not every question is for a machine.",                                                    score: { I: -2, II: -2, III: -2 } },
+      ],
+    },
+
+    {
+      prompt: "When you write — an essay, a long text, a difficult email — you'd like AI to —",
+      sub: "Whose voice should come out the other side?",
+      opts: [
+        { text: "Write the first draft. I'm faster as an editor than as a blank page.",                                                   score: { I: +1, II:  0, III: +2 } },
+        { text: "Suggest a phrase here and there. Light collaboration.",                                                                  score: { I:  0, II:  0, III: +1 } },
+        { text: "Help me find a quote or a fact. That's it. The sentences are mine.",                                                     score: { I:  0, II: +1, III: -1 } },
+        { text: "Stay out. Maybe spell-check. The voice has to be mine, end-to-end.",                                                     score: { I: -1, II:  0, III: -2 } },
+      ],
+    },
+
+    {
+      prompt: "The technology you'd most like to add to your life next is —",
+      sub: "Forced choice. There is one.",
+      opts: [
+        { text: "An always-on wearable assistant — pendant, glasses, earbud — that's there before I ask.",                                score: { I: +2, II: +1, III: +2 } },
+        { text: "A serious second-brain workflow — Obsidian, Logseq, Readwise — that remembers what I've read and said.",                 score: { I: +1, II: +2, III: -1 } },
+        { text: "A better single-purpose tool: a great e-reader, a great recorder, a great camera. Specialized.",                          score: { I:  0, II: +1, III: -1 } },
+        { text: "Less, actually. A dumb phone. A paper calendar. A wristwatch.",                                                          score: { I: -2, II: -2, III: -1 } },
+      ],
+    },
+
+    {
+      prompt: "Five years from now, the honest description of your relationship to technology is —",
+      sub: "Stop selling it to yourself. What is it, really?",
+      opts: [
+        { text: "An always-on agent runs much of my outer life so I can focus on the inner one.",                                         score: { I: +2, II: +1, III: +2 } },
+        { text: "A second brain that remembers everything I've encountered, retrieves on demand, but writes nothing for me.",             score: { I: +1, II: +2, III: -1 } },
+        { text: "A few quiet tools. Mostly invisible. Helpful when summoned. Otherwise off.",                                             score: { I: -1, II:  0, III:  0 } },
+        { text: "Less than now. A flip phone, a notebook, and my own attention.",                                                         score: { I: -2, II: -2, III: -2 } },
+      ],
+    },
+  ];
+
+  // ─────────────────────────────────────────── DATA: 8 types
+  // Three letters: I (A/R), II (C/L), III (G/H)
+
+  const TYPES = {
+    "ACG": {
+      name: "The Always-On Agent",
+      desc: "You want technology everywhere, you want it to remember everything, and you want it to act on your behalf. You are who Engelbart's program led to — and who Brynjolfsson worried it would lead to. The bicycle, the chauffeur, and the autopilot, all in one.",
+      reco: {
+        title: "Go all-in on an <em>agentic wearable</em>.",
+        pitch: "An always-on AI pendant or smart-glasses kit. You're the early-adopter who actually has the temperament for it.",
+        body: [
+          "Devices like Limitless, the Bee pendant, Meta-Ray-Ban-class smart glasses, or whatever the next Humane-style attempt turns into are calibrated to exactly your tolerance for delegation. Most people will buy these and quietly hate them. You won't.",
+          "Pair the wearable with a single agentic LLM app (Claude, ChatGPT) configured to take actions on your accounts. Set the dial high.",
+        ],
+        watchout: "Run a quarterly audit: which decisions have you stopped making, and did you mean to?",
+      },
+    },
+    "ACH": {
+      name: "The Lossless Witness",
+      desc: "You want technology around you constantly — but as a witness, not a writer. The AI logs. The AI indexes. The AI does not put words in your mouth. Your life is the corpus; you are the only author of what to do with it.",
+      reco: {
+        title: "A <em>memory-first</em> stack. Recall, not generation.",
+        pitch: "An always-on transcription tool (Limitless, Plaud) plus a search-first archive. No drafting features.",
+        body: [
+          "Wear or carry a recorder that listens by default and lets you search later. Pair it with a personal archive (Obsidian, Logseq, Readwise) you actually search.",
+          "Aggressively disable any \"summarize for me\" or \"draft a reply\" feature. The win is the searchable transcript, not the LLM riff on top of it.",
+        ],
+        watchout: "If the product nudges you toward auto-replies, switch products.",
+      },
+    },
+    "ALG": {
+      name: "The Ambient Co-pilot",
+      desc: "You want technology in the background of your work and your day, and you trust generative AI to draft, decide, and act — but you don't want a permanent record of every dinner and every walk. Generate the work, don't record the table.",
+      reco: {
+        title: "An <em>ambient</em> AI assistant. Generate freely; don't capture.",
+        pitch: "An always-on voice agent (earbud, glasses, watch) wired into a generative model. Memory off. Generation on.",
+        body: [
+          "An audio-AI wearable plus a frontier LLM voice assistant (the kind you can interrupt mid-sentence) is the shape that fits you. Smart glasses with audio-only AI, an always-listening earbud, or an AI-augmented watch — all fine.",
+          "Configure for: generation always on, transcription archive off. The device should help you draft an email by voice on a walk; it shouldn't keep the recording afterwards.",
+        ],
+        watchout: "The default settings of these products are not your defaults. Read the privacy panel.",
+      },
+    },
+    "ALH": {
+      name: "The Honest Tool-User",
+      desc: "You want technology in the background, but the moment is yours and the words are yours. Use AI to retrieve, to remind, to look things up — not to author and not to record. The classic Engelbart posture: tool, not chauffeur.",
+      reco: {
+        title: "An <em>ask-and-be-answered</em> setup. No camera. No archive.",
+        pitch: "A voice assistant (an LLM-equipped earbud, a watch) used for retrieval only.",
+        body: [
+          "Voice-in / voice-out tools fit you. They keep the device invisible, the interface conversational, and the input ephemeral. Treat the assistant like a friend who happens to have read everything: ask, get answered, move on.",
+          "Strict rule: no continuous capture, no transcript archive, no generative drafting. The point is to keep generation in your hands.",
+        ],
+        watchout: "Refuse any \"memory\" feature that defaults to on.",
+      },
+    },
+    "RCG": {
+      name: "The Surgical Outsourcer",
+      desc: "You don't want technology lurking. But when you sit down at a tool, you want it to do real work — drafting, deciding, acting. Off most of the time. Agent-grade when on. The phone in a drawer; the LLM open at full screen for an hour.",
+      reco: {
+        title: "An <em>on-demand</em> agent. The phone, taken seriously.",
+        pitch: "A single LLM app (Claude, ChatGPT) treated as a workshop you walk into.",
+        body: [
+          "Don't go wearable — the reach gesture (\"I am now using the AI\") is doing real psychological work for you. Don't sand it off.",
+          "Pick one frontier model and one app. Build a deep relationship with it. Use Projects, Custom GPTs, agent mode. When the session ends, close the laptop and walk away.",
+        ],
+        watchout: "If you start carrying the agent into the dinner, you've changed types.",
+      },
+    },
+    "RCH": {
+      name: "The Disciplined Archivist",
+      desc: "You don't want ambient technology, but when you choose to capture, you capture lossless and lossless on purpose. You write your own conclusions on what you've gathered. You are building a personal archive — not a personal assistant.",
+      reco: {
+        title: "A press-to-record device. <em>An Obsidian vault.</em> A search bar.",
+        pitch: "A handheld voice recorder + a search-first second brain. No AI summarization.",
+        body: [
+          "Your stack: a press-to-record voice memo tool (Plaud Note, a Sony recorder, native Voice Memos with discipline), a serious notes app (Obsidian, Logseq), and a personal-archive layer (Readwise, hand-rolled).",
+          "Resist any tool that records by default. The moment of pressing the button is the moment you become the author of what's worth keeping.",
+        ],
+        watchout: "Don't outsource the indexing to an LLM. Build your own taxonomy. The labels are the thinking.",
+      },
+    },
+    "RLG": {
+      name: "The Summoned Generator",
+      desc: "You don't want technology lurking. You don't want a memory of every moment. But when you do reach for AI, you want it to do real work — write, decide, act. Then put it down.",
+      reco: {
+        title: "A laptop. <em>And a serious LLM workflow.</em>",
+        pitch: "Claude or ChatGPT on a desktop, used the way a craftsman uses a workshop.",
+        body: [
+          "You don't want a wearable. You don't want a pendant. You don't want a pin. You want a workshop you walk into and out of.",
+          "Build a deep relationship with one frontier-model app (Claude Projects, ChatGPT Custom GPTs) and let that be the only place generation happens. A Rabbit-R1-style dedicated AI device also fits if you want one — the principle is the same: a discrete object you reach for.",
+        ],
+        watchout: "Beware the day a wearable starts to feel \"convenient.\" That's how it gets you.",
+      },
+    },
+    "RLH": {
+      name: "The Unaugmented",
+      desc: "You don't want technology embedded in your life, you don't want capture, you don't want generation. The augmentation tradition's logical endpoint, for some people, is needing less software, not more. This is a defensible reading of Engelbart, not a betrayal of him.",
+      reco: {
+        title: "Buy a <em>dumb phone</em>. And a notebook.",
+        pitch: "A Light Phone (or any phone with the smart parts removed), a Field Notes book, a wristwatch, a kitchen timer.",
+        body: [
+          "Your stack: a flip phone or a Light Phone, a paper notebook, a wristwatch, and a kitchen timer for focus. That's the whole thing.",
+          "If you need an LLM for a specific task, walk to a laptop and use one. Then close it. The friction is the feature.",
+          "This is not a Luddite position. It is the logical conclusion of a particular reading of the augmentation tradition: the most augmented person is the one who has chosen exactly which tools deserve to be near their attention, and refused the rest.",
+        ],
+        watchout: "Beware feeling smug about it. The point is the practice, not the identity.",
+      },
+    },
+  };
+
+  // ─────────────────────────────────────────── STATE
+  const state = {
+    answers: new Array(QUESTIONS.length).fill(null), // -2..+2 contributions per option
+    current: 0,
+  };
+
+  const heroEl    = document.getElementById('hero');
+  const quizEl    = document.getElementById('quiz');
+  const resultEl  = document.getElementById('result');
+
+  // ─────────────────────────────────────────── QUIZ rendering
+  const railEl    = document.getElementById('progressRail');
+  const numEl     = document.getElementById('qNum');
+  const promptEl  = document.getElementById('qPrompt');
+  const subEl     = document.getElementById('qSub');
+  const optionsEl = document.getElementById('options');
+  const prevBtn   = document.getElementById('prevBtn');
+
+  // build progress rail once
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const t = document.createElement('div');
+    t.className = 'progress-tick';
+    railEl.appendChild(t);
+  }
+
+  function paintRail() {
+    railEl.querySelectorAll('.progress-tick').forEach((t, i) => {
+      t.classList.toggle('is-done', state.answers[i] !== null && i < state.current);
+      t.classList.toggle('is-current', i === state.current);
+    });
+  }
+
+  function renderQuestion() {
+    const i = state.current;
+    const q = QUESTIONS[i];
+    numEl.textContent = `Question ${i + 1} of ${QUESTIONS.length}`;
+    promptEl.textContent = q.prompt;
+    subEl.textContent = q.sub;
+    optionsEl.innerHTML = '';
+
+    q.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      if (state.answers[i] === oi) btn.classList.add('is-selected');
+      btn.innerHTML = `
+        <span class="opt-tag">${oi + 1}</span>
+        <span class="opt-text">${opt.text}</span>
+      `;
+      btn.addEventListener('click', () => choose(oi));
+      optionsEl.appendChild(btn);
+    });
+
+    prevBtn.disabled = i === 0;
+    paintRail();
+  }
+
+  function choose(optIdx) {
+    state.answers[state.current] = optIdx;
+    paintRail();
+    // small visual pulse, then advance
+    setTimeout(() => {
+      if (state.current < QUESTIONS.length - 1) {
+        state.current++;
+        renderQuestion();
+        quizEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        finish();
+      }
+    }, 180);
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (state.current > 0) {
+      state.current--;
+      renderQuestion();
+      quizEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // ─────────────────────────────────────────── START
+  document.getElementById('startBtn').addEventListener('click', () => {
+    heroEl.style.display = 'none';
+    quizEl.classList.add('is-active');
+    state.current = 0;
+    renderQuestion();
+    quizEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ─────────────────────────────────────────── KEYBOARD
+  document.addEventListener('keydown', (e) => {
+    if (!quizEl.classList.contains('is-active')) return;
+    if (resultEl.classList.contains('is-active')) return;
+
+    const key = e.key;
+    if (key >= '1' && key <= '4') {
+      const i = parseInt(key, 10) - 1;
+      const q = QUESTIONS[state.current];
+      if (i < q.opts.length) {
+        e.preventDefault();
+        choose(i);
+      }
+    }
+    if (key === 'ArrowLeft' && state.current > 0) {
+      e.preventDefault();
+      state.current--;
+      renderQuestion();
+    }
+  });
+
+  // ─────────────────────────────────────────── SCORING
+  function score() {
+    const totals = { I: 0, II: 0, III: 0 };
+    state.answers.forEach((optIdx, qi) => {
+      if (optIdx == null) return;
+      const opt = QUESTIONS[qi].opts[optIdx];
+      totals.I   += opt.score.I   || 0;
+      totals.II  += opt.score.II  || 0;
+      totals.III += opt.score.III || 0;
+    });
+    return totals;
+  }
+
+  function codeOf(totals) {
+    return (totals.I  >= 0 ? 'A' : 'R')
+         + (totals.II >= 0 ? 'C' : 'L')
+         + (totals.III>= 0 ? 'G' : 'H');
+  }
+
+  // each axis range, conservatively, is roughly -16..+16 across 8 questions.
+  // For the marker we map to 0..100.
+  function axisPct(v) {
+    const max = 16;
+    const clamped = Math.max(-max, Math.min(max, v));
+    // -max → 0, +max → 100
+    return Math.round(((clamped + max) / (2 * max)) * 100);
+  }
+
+  // ─────────────────────────────────────────── RESULT rendering
+  const codeEl     = document.getElementById('resultCode');
+  const nameEl     = document.getElementById('resultName');
+  const descEl     = document.getElementById('resultDesc');
+  const axisOutEl  = document.getElementById('axisReadout');
+  const recoEl     = document.getElementById('reco');
+  const typesGrid  = document.getElementById('typesGrid');
+
+  function finish() {
+    quizEl.classList.remove('is-active');
+    quizEl.style.display = 'none';
+    resultEl.classList.add('is-active');
+
+    const totals = score();
+    const code = codeOf(totals);
+    const t = TYPES[code];
+
+    // Code, name, description
+    codeEl.innerHTML = `<span class="a">${code[0]}</span><span class="b">${code[1]}</span><span class="c">${code[2]}</span>`;
+    nameEl.textContent = t.name;
+    descEl.textContent = t.desc;
+
+    // Axis readout
+    const axisData = [
+      { name: "Presence",   pos: "Ambient",  neg: "Reach",     letter: code[0], left: "A", right: "R", value: totals.I  },
+      { name: "Memory",     pos: "Capture",  neg: "Live",      letter: code[1], left: "C", right: "L", value: totals.II },
+      { name: "Generation", pos: "Generate", neg: "Human",     letter: code[2], left: "G", right: "H", value: totals.III},
+    ];
+    axisOutEl.innerHTML = '';
+    axisData.forEach(ax => {
+      // marker position: positive value → near left (since 'A','C','G' are first letters / amber);
+      // we said positive = first letter. Map +max → 0% (left), -max → 100% (right).
+      const max = 16;
+      const clamped = Math.max(-max, Math.min(max, ax.value));
+      const pct = Math.round(((max - clamped) / (2 * max)) * 100); // invert so "A/C/G" sits left
+      const cell = document.createElement('div');
+      cell.className = 'axis-cell';
+      cell.innerHTML = `
+        <div class="nm">${ax.name} · ${ax.letter}</div>
+        <div class="meter">
+          <div class="meter-fill"></div>
+          <div class="marker" style="left: ${pct}%;"></div>
+        </div>
+        <div class="pole-row">
+          <span class="${ax.letter === ax.left ? 'lit' : ''}">${ax.left} · ${ax.pos}</span>
+          <span class="${ax.letter === ax.right ? 'lit' : ''}">${ax.neg} · ${ax.right}</span>
+        </div>
+      `;
+      axisOutEl.appendChild(cell);
+    });
+
+    // Reco
+    recoEl.innerHTML = `
+      <div class="label">What you should actually buy</div>
+      <h3>${t.reco.title}</h3>
+      <div class="pitch">${t.reco.pitch}</div>
+      ${t.reco.body.map(p => `<p>${p}</p>`).join('')}
+      <div class="why">
+        <div class="row"><span>Watch out for</span><span class="v">${t.reco.watchout}</span></div>
+      </div>
+    `;
+
+    // All eight types
+    typesGrid.innerHTML = '';
+    Object.entries(TYPES).forEach(([c, info]) => {
+      const pill = document.createElement('div');
+      pill.className = 'type-pill' + (c === code ? ' you' : '');
+      pill.innerHTML = `<span class="code">${c}</span>${info.name}`;
+      typesGrid.appendChild(pill);
+    });
+
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ─────────────────────────────────────────── RESULT actions
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    state.answers = new Array(QUESTIONS.length).fill(null);
+    state.current = 0;
+    resultEl.classList.remove('is-active');
+    heroEl.style.display = 'flex';
+    quizEl.style.display = '';
+    quizEl.classList.remove('is-active');
+    heroEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', (e) => {
+    const totals = score();
+    const code = codeOf(totals);
+    const t = TYPES[code];
+    const text = `My Wearable AI Type: ${code} — ${t.name}.`;
+    navigator.clipboard?.writeText(text).then(() => {
+      e.target.textContent = 'Copied ✓';
+      setTimeout(() => { e.target.textContent = 'Copy your type'; }, 1800);
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
