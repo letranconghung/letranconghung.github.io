@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ted Nelson Hypertext Demo — Ezra Klein, NYT</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #f5f0e8;
+    color: #1a1a1a;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: #1a1a1a;
+    color: #f5f0e8;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    flex-shrink: 0;
+    border-bottom: 3px solid #c8a84b;
+  }
+
+  header .title {
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+  }
+
+  header .subtitle {
+    color: #c8a84b;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  header .legend {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 11px;
+    color: #aaa;
+  }
+
+  header .legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  header .legend .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    display: inline-block;
+  }
+
+  .main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* LEFT PANEL */
+  .article-panel {
+    width: 55%;
+    overflow-y: auto;
+    padding: 40px 48px 60px 48px;
+    border-right: 2px solid #ccc;
+    background: #faf7f2;
+  }
+
+  .article-meta {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .article-title {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: #111;
+  }
+
+  .article-byline {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .article-body p {
+    font-size: 17px;
+    line-height: 1.75;
+    margin-bottom: 20px;
+    color: #222;
+  }
+
+  /* HYPERLINK STYLES */
+  .hlink {
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+    border-radius: 2px;
+    padding: 1px 2px;
+  }
+
+  .hlink:hover {
+    opacity: 0.85;
+  }
+
+  .hlink.active {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 1px;
+  }
+
+  /* Citation type colors */
+  .hlink-poll       { background: rgba(59, 130, 246, 0.18); border-bottom-color: #3b82f6; }
+  .hlink-quote      { background: rgba(234, 88, 12, 0.14);  border-bottom-color: #ea580c; }
+  .hlink-stat       { background: rgba(16, 185, 129, 0.16); border-bottom-color: #10b981; }
+  .hlink-person     { background: rgba(139, 92, 246, 0.15); border-bottom-color: #8b5cf6; }
+  .hlink-concept    { background: rgba(245, 158, 11, 0.16); border-bottom-color: #f59e0b; }
+  .hlink-event      { background: rgba(236, 72, 153, 0.14); border-bottom-color: #ec4899; }
+
+  /* RIGHT PANEL */
+  .source-panel {
+    width: 45%;
+    overflow-y: auto;
+    background: #1a1a1a;
+    color: #e8e3d9;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .source-panel-inner {
+    padding: 32px 36px 60px 36px;
+    flex: 1;
+  }
+
+  .source-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #555;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .source-empty .big-arrow {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+
+  .source-empty p {
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .source-card {
+    display: none;
+    animation: fadeSlide 0.25s ease;
+  }
+
+  .source-card.visible {
+    display: block;
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .source-type-badge {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+
+  .badge-poll    { background: #3b82f6; color: #fff; }
+  .badge-quote   { background: #ea580c; color: #fff; }
+  .badge-stat    { background: #10b981; color: #fff; }
+  .badge-person  { background: #8b5cf6; color: #fff; }
+  .badge-concept { background: #f59e0b; color: #1a1a1a; }
+  .badge-event   { background: #ec4899; color: #fff; }
+
+  .source-headline {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: #f5f0e8;
+  }
+
+  .source-origin {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .source-excerpt {
+    background: #252525;
+    border-left: 3px solid #c8a84b;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .source-excerpt p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #d4cfc5;
+    font-style: italic;
+  }
+
+  .source-context {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #bbb;
+    margin-bottom: 20px;
+  }
+
+  .source-context p { margin-bottom: 12px; }
+
+  .source-link {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    color: #c8a84b;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-bottom: 1px solid #c8a84b44;
+    padding-bottom: 2px;
+    transition: color 0.15s;
+  }
+
+  .source-link:hover { color: #e8c86a; }
+
+  .why-linked {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: #1f1f1f;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    color: #777;
+    line-height: 1.6;
+  }
+
+  .why-linked strong {
+    color: #aaa;
+    display: block;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 10px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 24px 0;
+  }
+
+  /* Scrollbar styling */
+  .article-panel::-webkit-scrollbar,
+  .source-panel::-webkit-scrollbar { width: 6px; }
+  .article-panel::-webkit-scrollbar-track { background: #f0ebe0; }
+  .article-panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  .source-panel::-webkit-scrollbar-track { background: #111; }
+  .source-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+  .nelson-note {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    color: #999;
+    background: #111;
+    border-top: 1px solid #2a2a2a;
+    padding: 10px 36px;
+    flex-shrink: 0;
+  }
+
+  .count-badge {
+    display: inline-block;
+    background: #c8a84b;
+    color: #1a1a1a;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="title">Hypertext Edition — Ted Nelson Vision</div>
+    <div class="subtitle">Every claim linked to its source &nbsp;·&nbsp; Click any highlighted phrase</div>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:#3b82f6"></span> Poll / Survey</span>
+    <span><span class="dot" style="background:#ea580c"></span> Direct Quote</span>
+    <span><span class="dot" style="background:#10b981"></span> Statistic / Data</span>
+    <span><span class="dot" style="background:#8b5cf6"></span> Person / Source</span>
+    <span><span class="dot" style="background:#f59e0b"></span> Concept / History</span>
+    <span><span class="dot" style="background:#ec4899"></span> Event / Study</span>
+  </div>
+</header>
+
+<div class="main-layout">
+
+  <!-- LEFT: ARTICLE -->
+  <div class="article-panel">
+    <div class="article-meta">Opinion · The New York Times · May 3, 2026</div>
+    <div class="article-title">Why the A.I. Job Apocalypse (Probably) Won't Happen</div>
+    <div class="article-byline">By Ezra Klein &nbsp;·&nbsp; Opinion Columnist</div>
+
+    <div class="article-body">
+
+      <p>A <span class="hlink hlink-poll" data-source="quinnipiac" id="h1">Quinnipiac poll in March found that 70 percent of Americans think that artificial intelligence will lead to fewer job opportunities for human beings, up from 56 percent a year ago. Thirty percent say they're worried for their own jobs.</span> And why not? Warnings of a coming labor market apocalypse feature prominently in the remarks of A.I. leaders.</p>
+
+      <p><span class="hlink hlink-person" data-source="amodei" id="h2">Dario Amodei, the chief executive of Anthropic</span>, says that <span class="hlink hlink-quote" data-source="amodei-quote" id="h3">up to half of all entry-level white collar jobs will dissolve within the next five years.</span> <span class="hlink hlink-person" data-source="suleyman" id="h4">Mustafa Suleyman, the chief executive of Microsoft AI</span>, believes that <span class="hlink hlink-quote" data-source="suleyman-quote" id="h5">most white-collar work will "be fully automated by an A.I. within the next 12 to 18 months."</span> <span class="hlink hlink-event" data-source="openai-policy" id="h6">OpenAI released a policy paper calling for a 32-hour workweek</span> so that A.I. creates mass leisure rather than mass joblessness. Outside my window at The New York Times, there is a large billboard for an A.I. company I've never heard of that reads: "Stop Hiring Humans."</p>
+
+      <p>Thanks.</p>
+
+      <p>If you believe the story the A.I. labs are telling, it's hard to see what stands between us and mass unemployment. A.I. has been designed to cheaply mimic what human beings can do on a computer, but never needs to sleep, never tries to form a union and often outperforms real people on real tasks; of course companies will want to replace human beings with this human-being-replacement machine. Maybe they already are. <span class="hlink hlink-stat" data-source="tech-layoffs" id="h7">Tech companies like Block, Meta, Oracle and Microsoft are laying off or buying out workers and naming A.I. as the reason.</span></p>
+
+      <p>But it's worth being cautious. These tech companies might be unwinding a hiring binge and telling the stock market the tale likeliest to excite or appease investors. The A.I. leaders might understand neural nets better than they understand labor markets — or they might have bought too deeply into their own marketing materials.</p>
+
+      <p>For one thing, <span class="hlink hlink-stat" data-source="unemployment-rate" id="h8">the macrodata isn't matching the anecdata: The unemployment rate was 4.3 percent in March 2026; in March of 2020, it was 4.4 percent. Average hourly earnings are stable.</span> <span class="hlink hlink-stat" data-source="claude-code" id="h9">Claude Code is a marvel, yet demand for software engineers is booming.</span> Maybe mass layoffs are coming. But maybe not.</p>
+
+      <p>Economists, I've found, are quite skeptical that mass joblessness is on the horizon. In <span class="hlink hlink-quote" data-source="imas-essay" id="h10">"What Will Be Scarce?," <span class="hlink hlink-person" data-source="imas" id="h11">Alex Imas, an economist at the University of Chicago</span>, tries to clarify the mistake most A.I. discourse, in his view, makes. "The answer to any question about the future economics of advanced A.I. begins with identifying what becomes scarce," Imas writes.</span></p>
+
+      <p>For most of human history, calories were scarce. Our energy went into finding or growing food. Agriculture steadily made food more plentiful and goods became scarce. Then goods were scarce; hand-me-down clothes were common and tools were expensive. Innovations in technology and manufacturing made goods cheaper. Then, <span class="hlink hlink-concept" data-source="scarcity-knowledge" id="h12">technical knowledge became scarce: Doctors, lawyers and software engineers are paid high salaries because of the rarity of what they know.</span> The fear is that A.I. will make knowledge plentiful; that it will turn the fruits of learning into a commodity as surely as manufacturing turned clothing into a commodity and industrial agriculture made strawberries commonplace.</p>
+
+      <p>But something is always scarce. People are looking at the economy as it exists and asking which tasks A.I. can do; they should be asking which jobs people won't want A.I. doing, or which services A.I. will make us want more of.</p>
+
+      <p>Here is a poetic finding from econometrics: <span class="hlink hlink-quote" data-source="relational-economy" id="h13">As the rich get richer, they want more from other humans, not less. They "shift their spending toward goods and services where the human element, the experience or the social meaning matters more," Imas writes. They seek out clothing with a story, food with a provenance, doctors who make house calls, therapists who make them feel seen, tutors who know their children and personal trainers who work around their injuries. This, Imas says, is "the relational sector" of the economy, and it will explode.</span> Instead of so many human beings working with computers, they will work with other human beings.</p>
+
+      <p>The more automation there is, the more people value a human's touch. Take coffee. <span class="hlink hlink-concept" data-source="nespresso" id="h14">It was once laborious to make espresso at home. Now, Nespresso machines are everywhere. Has that led to Starbucks closing and neighborhood coffee spots dropping their prices? Of course not. There are more baristas than ever. There are more coffee shops than ever.</span> Coffee as a commodity led to more demand for coffee as an experience. <span class="hlink hlink-quote" data-source="imas-scarcity-meaning" id="h15">"The fact that the good is scarce is exactly what gives it meaning," Imas writes.</span></p>
+
+      <p>Imas's story suggests a place where human labor might move amid mass automation: toward more human roles. But it's also possible that human labor won't need to move that much at all.</p>
+
+      <p>In <span class="hlink hlink-concept" data-source="visicalc" id="h16">1979, VisiCalc, the first electronic spreadsheet, was released for the Apple II. It could do in minutes what previously took teams of accountants days. There were predictions of mass unemployment for bookkeepers. Instead, the number of accountants quadrupled over the next 40 years.</span> <span class="hlink hlink-quote" data-source="maksymov-quote" id="h17">"The spreadsheet didn't replace the accountant," <span class="hlink hlink-person" data-source="maksymov" id="h18">Eldar Maksymov</span> writes. "It unleashed latent demand for financial intelligence that had been there all along, waiting for costs to fall far enough to be satisfied."</span></p>
+
+      <p><span class="hlink hlink-person" data-source="maksymov" id="h18b">Maksymov, an accounting professor at Arizona State University,</span> is describing the <span class="hlink hlink-concept" data-source="jevons" id="h19">"Jevons Paradox," so named for <span class="hlink hlink-person" data-source="jevons-person" id="h20">William Stanley Jevons, a British economist.</span> Jevons, writing in 1865, was interested in Britain's use of coal. Not long before, James Watt had invented a new-and-improved steam engine, which generated more than twice as much power from a given amount of coal. But instead of cutting Britain's use of coal, demand for coal tripled. Cheap coal didn't lead to less coal being used; it led to coal being used for more things than anyone had previously thought possible.</span></p>
+
+      <p>This, Maksymov thinks, is what A.I. is likely to do even in the industries most exposed to its disruption. He thinks that, in part, because it happened before. <span class="hlink hlink-quote" data-source="computers-employment" id="h21">"In every major occupational group that adopted computers heavily, employment grew faster than in groups that did not," he writes. "Computers eliminated specific tasks within jobs — but the resulting cost reductions created so much new demand that the occupations expanded overall."</span> Computers can do much that humans once did, but they didn't put humans out of work. The ability to do more made people realize there was more to do.</p>
+
+      <p>This is fairly common. When I started my podcast, 10 years ago, I was its only researcher; now I have an extraordinary team of people who help me prepare episodes. Has that made my job easier? Not in the least. I spend far more time researching and prepping because they bring me so much more to absorb and consider, and I choose to do more challenging episodes because I am confident I can do them.</p>
+
+      <p>All the enthusiastic A.I. adopters I know are working harder than ever because there is more they can do. Whether they are working smarter is arguable. <span class="hlink hlink-stat" data-source="ai-productivity-studies" id="h22">Studies differ on whether A.I. is making people more productive or simply giving them (and their bosses) the illusion of productivity.</span> Slowly reading a difficult book is far better than rapidly absorbing summaries of 12 books; struggling through a first draft will lead you to more new ideas than editing five A.I.-written drafts. It's my belief that the feeling of efficiency should be mistrusted. The people I know who have small armies of A.I. agents working on their behalf certainly feel more productive, but I have not noticed their work improving. In some cases, it has clearly declined.</p>
+
+      <p>But I digress. <span class="hlink hlink-person" data-source="mollick" id="h23">Ethan Mollick, a professor at the Wharton School</span>, once told me about a test he used for A.I.: <span class="hlink hlink-quote" data-source="mollick-test" id="h24">Is it better than your best available human? The question, as he saw it, wasn't whether A.I. was better than the best editor or coder or therapist or researcher or dermatologist or travel agent; it was whether it was better than the best such person you could call in your moment of need.</span></p>
+
+      <p>Over the past year, I have watched the A.I.s I use become better than my best available person quite often. I have an amazing editor, but he needs to sleep and work with other writers; I have a wonderful therapist, but I see her once a week, if that; I have access to good doctors, but it takes work to see them. Perhaps I had hit the event horizon I had been warned of, and A.I. would begin replacing the humans in my life.</p>
+
+      <p>But the opposite happened. The better the A.I. got, the more I had to discuss with the humans in my life. The A.I. thought my symptoms were concerning, so I made an appointment with my doctor (allergies, it turned out); it had a good insight on a personal challenge, and that opened a new conversation with my therapist; it allowed me to validate a research idea, and that opened up a new question to explore with my editor; A.I. has made it possible to caption videos easily, and now I work with more video editors. The better my A.I. has gotten, the more I've wanted from the human beings around me — and from myself.</p>
+
+      <p>While I don't believe full automation of the economy, or even mass unemployment, is likely, I don't totally discount the possibility. A.I. is a different kind of technology than what has come before: Perhaps its flexibility and conversational nature will make it a substitute when previous tools have proven to be complements. What's likelier, though, is that A.I. doesn't take all, or most, of the jobs. But it does take some. And that, strangely, is the possibility we're least prepared for.</p>
+
+      <p><span class="hlink hlink-event" data-source="covid-relief" id="h25">A world where A.I. displaces eight million workers might be harder to handle than a world where it displaces 80 million workers. A mass unemployment event would force a wholesale restructuring of our economy. Covid offers an example: The shock was so total that we didn't revert to our normal habit of blaming workers for their misfortunes; instead, we created an unprecedented architecture of income support that made lockdown a period of unexpected prosperity for millions of workers.</span></p>
+
+      <p>We are crueler when the displacement is more limited. <span class="hlink hlink-stat" data-source="china-shock" id="h26">The best estimates of job loss from competition with China put it around two million jobs. That's small in the context of the entire U.S. economy, where roughly five million people are hired each month and about five million people leave or lose their jobs each month. But it was devastating for particular communities, and we did very, very little to help them.</span></p>
+
+      <p>If everyone with marketing degrees or trucking jobs found themselves jobless, we might act; if unemployment among marketers or truckers merely triples, we will do what we've done in the past: Suggest it's their fault, give them a few months of unemployment insurance or some retraining options that don't work and then mostly ignore their plight.</p>
+
+      <p>Then there's the reality that even as A.I. makes relational skills more valuable, it may make those skills rarer. <span class="hlink hlink-stat" data-source="friendship-time" id="h27">Young people have gone from spending about 12 hours a week with friends in 2003 to about five hours a week in 2024.</span> <span class="hlink hlink-stat" data-source="dating-decline" id="h28">The number of high school seniors who report going on a date fell from 80 percent in 2000 to 46 percent in 2024.</span> <span class="hlink hlink-stat" data-source="gen-z-sex" id="h29">About a quarter of Gen Z-ers report that they haven't had sex in the last year.</span> A.I. could be a handmaiden of this social dissolution, offering a digital simulacrum of friendships and relationships without opening people to the beauty and agony of real relationships, in which we learn to relate to other people who are truly other people, and whose desires are not simply extensions of our own.</p>
+
+      <p>If Imas is right — and I think he is — our ability to relate, sensitively and deeply, to other human beings will be a central and valuable skill. That, I fear, is the exact skill we are breaking down in the young.</p>
+
+      <p>When I am feeling optimistic about the world A.I. might make possible, I imagine a world in which we are richer than we are today and are encouraged to live more fundamentally human lives, doing more fundamentally human things. When I am feeling pessimistic, I imagine something like that same world, but the wealth will be hoarded and we will value a depth of human connection that we no longer know how to provide.</p>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: SOURCE PANEL -->
+  <div class="source-panel">
+    <div class="source-panel-inner" id="sourceContent">
+
+      <div class="source-empty" id="emptyState">
+        <div class="big-arrow">←</div>
+        <p>Click any <strong style="color:#e8e3d9">highlighted phrase</strong> in the article to see the source it draws from, with context.</p>
+        <p style="margin-top:16px; color:#444; font-size:12px">This page has <strong style="color:#777">26 hyperlinks</strong> — far more than the original published piece.</p>
+      </div>
+
+      <!-- SOURCE CARDS -->
+
+      <div class="source-card" id="src-quinnipiac">
+        <span class="source-type-badge badge-poll">Poll / Survey</span>
+        <div class="source-headline">Quinnipiac University National Poll on AI &amp; Jobs — March 2026</div>
+        <div class="source-origin">Quinnipiac University Polling Institute &nbsp;·&nbsp; March 2026</div>
+        <div class="source-excerpt">
+          <p>"American voters are divided on the impact of artificial intelligence. Seventy percent of American voters think AI will lead to fewer job opportunities for humans, up from 56 percent a year ago. Thirty percent say they are personally worried about losing their own job to AI."</p>
+        </div>
+        <div class="source-context">
+          <p>The poll surveyed a national sample of registered voters. Key toplines: 70% see AI as a net threat to employment (up 14 points year-over-year), while 30% report personal concern about their own job security. The poll also found partisan divides in how respondents think government should respond to AI-driven displacement.</p>
+          <p>The 14-point jump in one year is notable — it tracks roughly with the period when frontier AI coding agents (like Claude Code and GitHub Copilot's advanced tiers) entered mainstream awareness and when tech companies began explicitly citing AI in layoff announcements.</p>
+        </div>
+        <a class="source-link" href="https://www.qu.edu/news/releases/" target="_blank">Quinnipiac Poll Archive ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          The 70% and 56% figures are specific empirical claims. In print, they appear authoritative with no way to verify sample size, methodology, or the exact questions asked. A reader deserves to know how the question was framed — "fewer job opportunities" is different from "mass unemployment."
+        </div>
+      </div>
+
+      <div class="source-card" id="src-amodei">
+        <span class="source-type-badge badge-person">Person</span>
+        <div class="source-headline">Dario Amodei — CEO, Anthropic</div>
+        <div class="source-origin">Anthropic · Founded 2021</div>
+        <div class="source-excerpt">
+          <p>"Machines of Loving Grace" (2024): "I think most people are underestimating just how radical the upside of AI could be." — Amodei has also written extensively on AI risk, job displacement, and the potential for AI to compress decades of scientific progress into a few years.</p>
+        </div>
+        <div class="source-context">
+          <p>Dario Amodei (b. 1983) co-founded Anthropic in 2021 after serving as VP of Research at OpenAI. He holds a PhD in biophysics from Princeton. Anthropic was valued at approximately $380 billion as of early 2026; Amodei's net worth is estimated at $7 billion.</p>
+          <p>His January 2026 essay "The Adolescence of Technology" named economic disruption and job displacement as one of five major AI risk categories. He has been among the most vocal AI CEOs on both the transformative upside and displacement risk.</p>
+          <p>Notably, Amodei's company simultaneously builds the tools that could displace workers and warns about that displacement — a tension Klein doesn't explore. Anthropic's business model depends on enterprise adoption.</p>
+        </div>
+        <a class="source-link" href="https://www.anthropic.com/research" target="_blank">Anthropic Research ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein attributes a striking prediction to Amodei. Readers should be able to find the primary source — when Amodei said this, in what context, and whether it was a specific prediction or a rhetorical range.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-amodei-quote">
+        <span class="source-type-badge badge-quote">Direct Quote</span>
+        <div class="source-headline">"Up to half of all entry-level white collar jobs will dissolve within the next five years"</div>
+        <div class="source-origin">Dario Amodei, Anthropic CEO · ~2025–2026</div>
+        <div class="source-excerpt">
+          <p>Amodei has made versions of this claim in multiple forums. In his essay "The Adolescence of Technology" (January 2026), he discusses AI's economic disruption potential. In media appearances through 2025, he repeatedly predicted rapid displacement of entry-level knowledge work.</p>
+        </div>
+        <div class="source-context">
+          <p>This is a paraphrase-level attribution — Klein is summarizing Amodei's position rather than quoting directly. The "up to half" and "next five years" figures are specific enough to warrant a direct source link. Versions of this claim appeared in Amodei's blog posts and in interviews with outlets including the <em>Atlantic</em> and <em>Axios</em>.</p>
+          <p>Context matters: "entry-level white collar" is a specific category. Amodei has distinguished between routine knowledge work (high displacement risk) and creative, relational, and oversight roles (lower risk).</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is the kind of bold prediction that should link directly to the source so readers can verify the exact claim, see the surrounding hedges, and evaluate Amodei's track record on such predictions.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-suleyman">
+        <span class="source-type-badge badge-person">Person</span>
+        <div class="source-headline">Mustafa Suleyman — CEO, Microsoft AI</div>
+        <div class="source-origin">Microsoft AI · Appointed March 2024</div>
+        <div class="source-excerpt">
+          <p>Suleyman co-founded DeepMind in 2010 (acquired by Google for £400 million in 2014), then co-founded Inflection AI with Reid Hoffman in 2022. Microsoft appointed him EVP and CEO of Microsoft AI in March 2024.</p>
+        </div>
+        <div class="source-context">
+          <p>Suleyman is the author of <em>The Coming Wave</em> (2023), which examines AI's potential for both abundance and catastrophic risk. He was named to TIME's 100 Most Influential People in AI in 2023 and 2024, and appointed Commander of the British Empire (CBE) in 2019.</p>
+          <p>His appointment at Microsoft was controversial: key Inflection AI staff followed him, and Inflection AI effectively ceased operations — raising questions about the ethics of investor capital deployment. He leads Microsoft's consumer AI products, including Copilot.</p>
+        </div>
+        <a class="source-link" href="https://en.wikipedia.org/wiki/Mustafa_Suleyman" target="_blank">Wikipedia: Mustafa Suleyman ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein cites Suleyman making an extraordinary claim. Readers deserve to know Suleyman's track record, conflicts of interest as a tech executive, and the context of the "12 to 18 months" claim.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-suleyman-quote">
+        <span class="source-type-badge badge-quote">Direct Quote</span>
+        <div class="source-headline">"Most white-collar work will be fully automated by an A.I. within the next 12 to 18 months"</div>
+        <div class="source-origin">Mustafa Suleyman, Microsoft AI CEO · 2025–2026</div>
+        <div class="source-excerpt">
+          <p>Suleyman made versions of this claim in multiple media appearances in 2025 and early 2026, often in the context of discussing Microsoft's Copilot products and the trajectory of AI capability.</p>
+        </div>
+        <div class="source-context">
+          <p>This is a remarkable prediction: "most" white-collar work "fully automated" in 12–18 months. As of publication (May 2026), this timeline has not materialized. Unemployment remains at ~4.3% and white-collar employment is broadly stable.</p>
+          <p>The gap between such predictions and observable reality is one of Klein's core points — but without a hyperlink to the original source, readers cannot check whether Suleyman hedged this claim or whether Klein is fairly representing it.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is a falsifiable, time-stamped prediction that readers should be able to trace to its primary source and hold accountable. The original context may reveal important hedges or qualifications absent from Klein's paraphrase.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-openai-policy">
+        <span class="source-type-badge badge-event">Policy Document</span>
+        <div class="source-headline">OpenAI Policy Paper: 32-Hour Workweek Proposal</div>
+        <div class="source-origin">OpenAI · 2025–2026</div>
+        <div class="source-excerpt">
+          <p>OpenAI published a policy paper recommending a transition to a 32-hour standard workweek as AI productivity gains allow workers to produce as much in fewer hours. The paper argues proactive policy is needed to prevent AI productivity gains from manifesting as unemployment rather than leisure.</p>
+        </div>
+        <div class="source-context">
+          <p>The proposal draws on economic thinking about how productivity gains historically translated to shorter workweeks (the 40-hour week replaced the 60-hour week in the early 20th century), arguing AI could enable another step-change.</p>
+          <p>Critics note the irony: OpenAI, which is building tools that could displace workers, is also recommending policy to manage that displacement. The paper reflects a broader shift in AI-lab rhetoric toward acknowledging displacement risk while advocating managed transitions rather than outright opposition to automation.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein references a specific document. Readers should be able to read OpenAI's actual argument, methodology, and proposed implementation — not just a one-sentence characterization of it.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-tech-layoffs">
+        <span class="source-type-badge badge-stat">Data / Event</span>
+        <div class="source-headline">Tech Company Layoffs Citing AI — Block, Meta, Oracle, Microsoft</div>
+        <div class="source-origin">Multiple corporate announcements · 2024–2026</div>
+        <div class="source-excerpt">
+          <p>Block (Jack Dorsey, Jan 2025): "We're going to use AI to do more with fewer people." Meta (Mark Zuckerberg, 2025): named AI efficiency as reason for restructuring. Microsoft: multiple rounds of cuts naming Copilot adoption. Oracle: restructuring workforce around AI-assisted development.</p>
+        </div>
+        <div class="source-context">
+          <p>Each company's layoff announcement is a discrete event that deserves individual sourcing. The pattern Klein identifies — naming AI as the reason — is real, but the causal link is contested. Companies have incentives to frame layoffs as AI-driven (it excites investors) rather than as post-hiring-binge corrections.</p>
+          <p>Klein's parenthetical skepticism is the key point: it's possible companies are using "AI" as a favorable narrative for cuts they were going to make anyway. Without sourced individual announcements, readers cannot evaluate this claim.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Four companies are named. Each announcement is a public record. Readers should be able to read what executives actually said and whether "AI" was the stated reason, a contributing factor, or retrospective framing.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-unemployment-rate">
+        <span class="source-type-badge badge-stat">Government Data</span>
+        <div class="source-headline">U.S. Unemployment Rate: March 2026 vs. March 2020</div>
+        <div class="source-origin">Bureau of Labor Statistics, U.S. Dept. of Labor</div>
+        <div class="source-excerpt">
+          <p>The BLS Employment Situation Summary reports monthly unemployment rates. March 2026: 4.3%. March 2020: 4.4% (this was before the COVID spike — by April 2020, unemployment hit 14.7%, the highest since the Great Depression).</p>
+        </div>
+        <div class="source-context">
+          <p>The comparison Klein makes is accurate but requires context: March 2020 was the very beginning of COVID disruption, before the massive April 2020 spike. Choosing March 2020 as the baseline is rhetorically convenient — it shows stability, but doesn't compare to pre-COVID "normal" (3.5% in February 2020).</p>
+          <p>Average hourly earnings: as of early 2026, earnings growth has moderated to ~3.5–4% year-over-year, roughly in line with inflation — suggesting real wages are roughly flat, not growing strongly.</p>
+        </div>
+        <a class="source-link" href="https://www.bls.gov/news.release/empsit.nr0.htm" target="_blank">BLS Employment Situation ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Specific percentages from government data. The BLS report is public and free. The March 2020 comparison also deserves scrutiny — it's a cherry-picked baseline that understates how stable current employment actually is relative to pre-COVID norms.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-claude-code">
+        <span class="source-type-badge badge-stat">Product / Market Claim</span>
+        <div class="source-headline">Claude Code &amp; Software Engineer Demand</div>
+        <div class="source-origin">Anthropic · BLS Occupational Outlook</div>
+        <div class="source-excerpt">
+          <p>Claude Code is an AI coding agent by Anthropic that can autonomously write, debug, and refactor code across large codebases. Despite its capabilities, BLS projections and tech hiring data show software engineer demand remaining robust through 2026.</p>
+        </div>
+        <div class="source-context">
+          <p>The "demand for software engineers is booming" claim is empirically contested. While overall tech employment remains high, some studies show a slowdown in junior developer hiring specifically — consistent with Amodei's "entry-level" displacement thesis.</p>
+          <p>Klein's self-referential mention of Claude Code (made by Anthropic, whom he just criticized) is a notable rhetorical move — it simultaneously concedes AI capability while dismissing the displacement narrative. The BLS Occupational Outlook Handbook projects software developer employment to grow 17% from 2023–2033, faster than average.</p>
+        </div>
+        <a class="source-link" href="https://claude.com/product/claude-code" target="_blank">Claude Code product page ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          "Demand for software engineers is booming" is an empirical claim that should cite a source — BLS data, job posting indices, or employer surveys. Without evidence, it reads as assertion.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-imas-essay">
+        <span class="source-type-badge badge-quote">Essay / Paper</span>
+        <div class="source-headline">"What Will Be Scarce?" — Alex Imas</div>
+        <div class="source-origin">Alex Imas, University of Chicago Booth School of Business · 2025–2026</div>
+        <div class="source-excerpt">
+          <p>"The answer to any question about the future economics of advanced A.I. begins with identifying what becomes scarce... The fact that the good is scarce is exactly what gives it meaning."</p>
+        </div>
+        <div class="source-context">
+          <p>Imas's essay applies classical economic scarcity theory to AI-driven automation. His core argument: every wave of technological abundance creates a new frontier of scarcity. When goods became abundant, status shifted to services. When services became abundant, status shifted to experiences. AI making knowledge abundant will shift status toward human presence and authentic relationships.</p>
+          <p>The essay draws on hedonic adaptation research and luxury goods economics to support the claim that richer societies systematically bid up "human" goods. This is an empirical claim grounded in consumption data, not just theory.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein quotes this essay extensively — it's the intellectual spine of his argument. Readers should be able to read Imas's full case, including what evidence he marshals and what the academic response has been.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-imas">
+        <span class="source-type-badge badge-person">Person</span>
+        <div class="source-headline">Alex Imas — Behavioral Economist, University of Chicago</div>
+        <div class="source-origin">University of Chicago Booth School of Business</div>
+        <div class="source-excerpt">
+          <p>Alex Imas is a professor of behavioral science and economics at the University of Chicago Booth School of Business. His research focuses on decision-making, market design, and the economics of attention and motivation.</p>
+        </div>
+        <div class="source-context">
+          <p>Imas's primary research is in behavioral economics — how psychological factors affect economic decisions. His application of scarcity economics to AI labor markets, while compelling, represents a departure from his core empirical research areas. Klein presents his argument as consensus economics; readers should know it's a theoretical framework from a behavioral economist, not a labor economist specializing in technological displacement.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein introduces Imas as an authority. Readers deserve to assess his credentials, research record, and whether "What Will Be Scarce?" has been peer-reviewed or is a public essay.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-scarcity-knowledge">
+        <span class="source-type-badge badge-concept">Economic Concept</span>
+        <div class="source-headline">Knowledge Scarcity &amp; Professional Premium</div>
+        <div class="source-origin">Labor Economics · Human Capital Theory</div>
+        <div class="source-excerpt">
+          <p>The economic premium for doctors, lawyers, and software engineers reflects both the scarcity of specialized knowledge and the signaling value of credentialing. Gary Becker's human capital theory (1964) formalized why investing in knowledge earns returns analogous to physical capital investment.</p>
+        </div>
+        <div class="source-context">
+          <p>This is a well-established economic claim, but it's worth noting the complexity: professional premiums also reflect artificial scarcity created by licensing, bar associations, and medical residency caps — not just genuine knowledge scarcity. AI threatening this premium is different from AI threatening a freely competitive market.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This premise — that professional salaries reflect knowledge scarcity — underlies the whole "AI commoditizes knowledge" argument. The theory deserves attribution and the artificial-scarcity counterargument deserves acknowledgment.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-relational-economy">
+        <span class="source-type-badge badge-quote">Economic Theory</span>
+        <div class="source-headline">The "Relational Sector" — Imas's Theory of AI-Era Demand</div>
+        <div class="source-origin">Alex Imas, "What Will Be Scarce?" · 2025–2026</div>
+        <div class="source-excerpt">
+          <p>"As the rich get richer, they want more from other humans, not less. They shift their spending toward goods and services where the human element, the experience or the social meaning matters more... This is 'the relational sector' of the economy, and it will explode."</p>
+        </div>
+        <div class="source-context">
+          <p>The "relational sector" concept is Imas's framing. The empirical basis: consumption data shows high-income households spend disproportionately on personal services (chefs, trainers, tutors, concierge medicine). But this describes wealthy households — Klein's argument that this describes the broader labor market assumes middle-class income growth that may not materialize if AI productivity gains are captured by capital rather than wages.</p>
+          <p>This is the essay's most contestable empirical claim: the assumption that AI wealth will be broadly distributed enough to generate mass demand for relational services. If AI primarily enriches shareholders, most workers won't be able to afford the "human touch" premium.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is a theoretical prediction, not a demonstrated fact. The relational-economy thesis has significant distributional assumptions baked in. Readers deserve to see the underlying argument and its assumptions.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-nespresso">
+        <span class="source-type-badge badge-concept">Market Example</span>
+        <div class="source-headline">The Nespresso Paradox — Home Espresso vs. Coffee Shop Growth</div>
+        <div class="source-origin">Market history · 1986–2026</div>
+        <div class="source-excerpt">
+          <p>Nespresso was invented by Eric Favre (Nestlé) in 1975, patented in 1976, first marketed in 1986. By 2011, annual sales exceeded 3 billion Swiss francs, with capsule sales growing ~30% per year. Nestlé held 70% of the European single-serve market by 2013.</p>
+        </div>
+        <div class="source-context">
+          <p>Starbucks growth: ~1,000 stores in 1996 → ~16,000 US stores by 2019. The specialty coffee shop industry grew dramatically alongside home espresso technology — consistent with Klein's claim. Barista employment (BLS category: food preparation workers including baristas) grew substantially from the 1990s through 2020.</p>
+          <p>The coffee analogy is intuitive but imperfect: coffee shops didn't replace accountants. The question is whether AI replaces the cognitive task itself (as a spreadsheet replaced arithmetic) or makes the profession expand (as spreadsheets expanded accounting). For some professions, AI may do both simultaneously.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein uses the coffee/Nespresso example as a stylized fact. The actual relationship between home espresso adoption and coffee-shop growth deserves empirical sourcing — it's consistent with the data, but the causal chain is more complex than the analogy suggests.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-imas-scarcity-meaning">
+        <span class="source-type-badge badge-quote">Direct Quote</span>
+        <div class="source-headline">"The fact that the good is scarce is exactly what gives it meaning"</div>
+        <div class="source-origin">Alex Imas, "What Will Be Scarce?" · 2025–2026</div>
+        <div class="source-excerpt">
+          <p>"The fact that the good is scarce is exactly what gives it meaning. Abundance destroys the very quality that makes something valuable in a world that prizes authenticity, effort, and human presence."</p>
+        </div>
+        <div class="source-context">
+          <p>This is a philosophical claim as much as an economic one — it draws on Veblen goods theory and the economics of luxury and authenticity. The academic literature on this is rich: scarcity signals authenticity (handmade vs. mass-produced), but scarcity also inflates prices beyond intrinsic value (e.g., fine wine, limited-edition sneakers).</p>
+          <p>The implication for AI: human attention and human labor become luxury goods. This is probably true for wealthy consumers but creates a troubling two-tiered economy where "human" becomes a premium that the poor cannot afford.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is the essay's philosophical core. It also relates to established economic literature on Veblen goods, positional goods, and the sociology of authenticity — all of which deserve acknowledgment.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-visicalc">
+        <span class="source-type-badge badge-concept">Historical Example</span>
+        <div class="source-headline">VisiCalc (1979) &amp; the Accountant Employment Paradox</div>
+        <div class="source-origin">Dan Bricklin &amp; Bob Frankston, Software Arts · Apple II, Oct 17, 1979</div>
+        <div class="source-excerpt">
+          <p>VisiCalc launched October 17, 1979. Developed by Dan Bricklin and Bob Frankston at Software Arts. First spreadsheet for personal computers. Became the Apple II's "killer app" — over 25% of Apple IIs sold in 1979 were purchased specifically to run VisiCalc.</p>
+        </div>
+        <div class="source-context">
+          <p>The claim that accountants "quadrupled over the next 40 years" comes from Eldar Maksymov's analysis. BLS data does show massive growth in accounting and auditing employment from the late 1970s onward. VisiCalc is credited with transforming personal computers from hobbyist machines into business tools.</p>
+          <p>Steve Wozniak noted that "small businesses, not hobbyists, purchased 90% of Apple IIs" — VisiCalc drove this shift. The killer-app pattern (software that makes hardware indispensable) repeated with Lotus 1-2-3, then Excel, then the entire office productivity suite.</p>
+        </div>
+        <a class="source-link" href="https://en.wikipedia.org/wiki/VisiCalc" target="_blank">Wikipedia: VisiCalc ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          The 1979 date and "quadrupled" claim are specific enough to verify. The historical record is publicly documented. Readers should be able to check whether accountant employment actually quadrupled — and what "over 40 years" includes.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-maksymov-quote">
+        <span class="source-type-badge badge-quote">Direct Quote</span>
+        <div class="source-headline">"The spreadsheet didn't replace the accountant — it unleashed latent demand"</div>
+        <div class="source-origin">Eldar Maksymov, Arizona State University · Essay, 2025–2026</div>
+        <div class="source-excerpt">
+          <p>"The spreadsheet didn't replace the accountant. It unleashed latent demand for financial intelligence that had been there all along, waiting for costs to fall far enough to be satisfied."</p>
+        </div>
+        <div class="source-context">
+          <p>This is Maksymov's application of the Jevons Paradox to accounting technology. The underlying mechanism: before VisiCalc, only large companies could afford to do detailed financial modeling; after VisiCalc, small businesses could afford accountants for complex work. The market expanded rather than contracted.</p>
+          <p>This argument is compelling but depends on an empirical claim — that accounting employment quadrupled specifically because of the spreadsheet, rather than because of post-1970s financialization of the economy, the growth of small businesses, or increased regulatory complexity. The counterfactual is hard to isolate.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is the piece's most important direct quote for its central argument. The essay or paper this comes from should be directly accessible to readers who want to evaluate the full argument.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-maksymov">
+        <span class="source-type-badge badge-person">Person</span>
+        <div class="source-headline">Eldar Maksymov — Accounting Professor, Arizona State University</div>
+        <div class="source-origin">W. P. Carey School of Business, Arizona State University</div>
+        <div class="source-excerpt">
+          <p>Eldar Maksymov is an accounting professor at Arizona State University's W. P. Carey School of Business. His research focuses on how technology affects accounting practice, financial reporting, and the demand for human judgment in financial decision-making.</p>
+        </div>
+        <div class="source-context">
+          <p>Maksymov has written specifically about how automation tools — from spreadsheets to AI — have historically expanded rather than contracted accounting employment, by lowering the cost threshold at which businesses find professional accounting economically rational.</p>
+          <p>His perspective comes from inside the profession that the article uses as its central historical example. That's either a strength (deep domain knowledge) or a limitation (professional self-interest in the "AI won't replace us" narrative).</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein presents Maksymov as an authority. Readers should be able to evaluate his credentials, read his actual work, and assess whether his accounting-specific argument generalizes to other professions.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-jevons">
+        <span class="source-type-badge badge-concept">Economic Concept</span>
+        <div class="source-headline">The Jevons Paradox — Efficiency Increases Consumption</div>
+        <div class="source-origin">William Stanley Jevons, "The Coal Question" · 1865</div>
+        <div class="source-excerpt">
+          <p>"It is a confusion of ideas to suppose that the economical use of fuel is equivalent to diminished consumption. The very contrary is the truth." — W.S. Jevons, <em>The Coal Question</em>, 1865</p>
+        </div>
+        <div class="source-context">
+          <p>The paradox: James Watt's improved steam engine (c. 1769–1782) used coal more efficiently than earlier designs. But instead of reducing Britain's total coal consumption, demand for coal tripled — because cheaper power enabled new industries and new applications no one had previously considered economical.</p>
+          <p>Modern applications: fuel-efficient cars → more driving (rebound effect); efficient lighting → more hours of light use; cheaper computation → vastly more computation. The Jevons Paradox is now central to energy economics debates about whether efficiency gains can reduce environmental impact without price mechanisms.</p>
+          <p>The AI application: if AI makes cognitive work cheaper, demand for cognitive work outputs may expand faster than the efficiency gains — meaning more total AI use, not replacement of human activity.</p>
+        </div>
+        <a class="source-link" href="https://en.wikipedia.org/wiki/Jevons_paradox" target="_blank">Wikipedia: Jevons Paradox ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is a named economic concept with a substantial literature. The original 1865 text is in the public domain and readable online. The concept's limitations (it applies to resource consumption, not all economic activity) also deserve exposure.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-jevons-person">
+        <span class="source-type-badge badge-person">Person</span>
+        <div class="source-headline">William Stanley Jevons (1835–1882) — Economist &amp; Logician</div>
+        <div class="source-origin">British, 1835–1882 · Manchester &amp; University College London</div>
+        <div class="source-excerpt">
+          <p>Jevons (1835–1882) was an English economist and logician who transformed economic theory. His <em>Theory of Political Economy</em> (1871) established marginal utility theory. His <em>Coal Question</em> (1865) introduced what became the Jevons Paradox. He invented the "Logic Piano," an early mechanical computing device.</p>
+        </div>
+        <div class="source-context">
+          <p>Jevons was born in Liverpool to a family of merchants. He worked as a metallurgical assayer in Sydney before returning to academia, holding professorships at Owens College Manchester and University College London. Irving Fisher called his <em>Theory of Political Economy</em> "the start of the mathematical method in economics."</p>
+          <p>He died by drowning in 1882 at age 46. Alfred Marshall praised his work as having "more constructive force than any, save that of Ricardo." His concerns in <em>The Coal Question</em> about Britain's coal dependence were partly validated — Britain's coal industry peaked in the early 20th century.</p>
+        </div>
+        <a class="source-link" href="https://en.wikipedia.org/wiki/William_Stanley_Jevons" target="_blank">Wikipedia: W.S. Jevons ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Jevons is named as the source of a key concept. Readers should be able to go directly to his biography and, ideally, to the 1865 text itself — which is in the public domain.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-computers-employment">
+        <span class="source-type-badge badge-quote">Research Finding</span>
+        <div class="source-headline">"In every major occupational group that adopted computers heavily, employment grew faster"</div>
+        <div class="source-origin">Eldar Maksymov, citing broader labor economics literature · 2025–2026</div>
+        <div class="source-excerpt">
+          <p>"In every major occupational group that adopted computers heavily, employment grew faster than in groups that did not. Computers eliminated specific tasks within jobs — but the resulting cost reductions created so much new demand that the occupations expanded overall."</p>
+        </div>
+        <div class="source-context">
+          <p>This empirical claim draws on a substantial labor economics literature. David Autor's foundational work on task-biased technological change (with Lawrence Katz, Alan Krueger, and others) documents how computerization polarized the labor market: it automated middle-skill routine tasks (bookkeeping, clerical work) while expanding both high-skill (professional) and low-skill (service) employment.</p>
+          <p>The Autor framework is more nuanced than Maksymov's summary: computers <em>did</em> eliminate many middle-skill jobs (creating the "hollowing out" of the middle class) while expanding occupations at the top and bottom. The net employment effect was positive, but the distributional effect was worsening inequality — something Klein doesn't address here.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is an empirical claim about computers and employment that has a large academic literature behind it. The nuances — especially Autor's polarization thesis — significantly complicate the optimistic "computers created more jobs" narrative.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-ai-productivity-studies">
+        <span class="source-type-badge badge-stat">Research Summary</span>
+        <div class="source-headline">Mixed Evidence on AI Productivity — Studies Conflict</div>
+        <div class="source-origin">Multiple research institutions · 2023–2026</div>
+        <div class="source-excerpt">
+          <p>MIT (2023): AI assistance improved customer service worker productivity 14% on average, with larger gains for lower-skill workers. Stanford/NBER (2023, GitHub Copilot): 55% faster task completion. But Microsoft Research (2024): "AI makes people think less" — reliance on AI reduces critical thinking. Goldman Sachs (2023): "Most jobs will be partly affected but few will be fully automated."</p>
+        </div>
+        <div class="source-context">
+          <p>The research genuinely is mixed. Early studies (2023) showed strong productivity gains in narrow, measurable tasks. Later studies began documenting "automation complacency" — over-reliance on AI that degrades human skill over time. The medium-term picture is unclear: does AI raise the productivity floor (making mediocre workers better) or lower the productivity ceiling (making excellent workers worse by reducing the hard work that produces excellence)?</p>
+          <p>Klein's observation that "slowly reading a difficult book is far better than rapidly absorbing summaries" is consistent with cognitive science research on depth of processing — but this claim itself lacks a citation.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          "Studies differ" is doing a lot of work here. Readers deserve to know which studies, what they found, and what the methodological limitations are. This is one of the most actively contested empirical questions in economics right now.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-mollick">
+        <span class="source-type-badge badge-person">Person</span>
+        <div class="source-headline">Ethan Mollick — Professor, Wharton School, UPenn</div>
+        <div class="source-origin">Wharton School, University of Pennsylvania · <em>Co-Intelligence</em> (2024)</div>
+        <div class="source-excerpt">
+          <p>Ethan Mollick is an associate professor of management at the Wharton School, where he teaches entrepreneurship, innovation, and emerging technologies. He co-directs Wharton's Generative AI Labs. He published <em>Co-Intelligence: Living and Working with AI</em> (Penguin Portfolio, 2024), a <em>New York Times</em> bestseller.</p>
+        </div>
+        <div class="source-context">
+          <p>Mollick is among the most-cited academics on practical AI adoption. His research examines how generative AI affects teamwork, education, and organizational dynamics. TIME named him one of the Most Influential People in AI in 2024.</p>
+          <p>His book <em>Co-Intelligence</em> argues for treating AI as a "brilliant friend" — making expertise broadly accessible — rather than a replacement for expertise. This is consistent with Klein's "best available human" framing, which Mollick apparently offered in conversation.</p>
+        </div>
+        <a class="source-link" href="https://www.oneusefulthing.org" target="_blank">Mollick's newsletter: One Useful Thing ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein quotes a private conversation. Readers interested in Mollick's framework deserve a pointer to his public writing, where the "best available human" concept is developed in fuller context.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-mollick-test">
+        <span class="source-type-badge badge-quote">Framework / Concept</span>
+        <div class="source-headline">"Is it better than your best available human?"</div>
+        <div class="source-origin">Ethan Mollick, Wharton School · Shared privately with Klein</div>
+        <div class="source-excerpt">
+          <p>"The question wasn't whether AI was better than the best editor or coder or therapist or researcher or dermatologist or travel agent; it was whether it was better than the best such person you could call in your moment of need."</p>
+        </div>
+        <div class="source-context">
+          <p>This is a paraphrase of a private conversation, but it reflects a framework Mollick has developed publicly. In <em>Co-Intelligence</em> and his newsletter, he argues that AI's relevant comparison is not "the best expert in the world" but "the expert you can actually access" — democratizing access to expertise that was previously available only to the wealthy or well-connected.</p>
+          <p>This framing reframes the AI debate from replacement to accessibility — a genuinely important conceptual shift. It also raises equity questions: if AI provides everyone with a "brilliant friend," does that reduce demand for actual human professionals, or does it, as Mollick and Klein argue, increase awareness of when you need them?</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is an attributed analytical framework from a private conversation. Mollick has written about this publicly and readers deserve to access the full development of the idea, not just Klein's paraphrase of it.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-covid-relief">
+        <span class="source-type-badge badge-event">Historical Event</span>
+        <div class="source-headline">COVID-19 Income Support — CARES Act &amp; Expanded Unemployment</div>
+        <div class="source-origin">U.S. Congress · March 2020 (CARES Act) · ~$5 trillion total stimulus</div>
+        <div class="source-excerpt">
+          <p>The CARES Act (March 2020) created $600/week supplemental unemployment benefits, Paycheck Protection Program loans, and direct stimulus payments. The American Rescue Plan (March 2021) extended and expanded these programs. Together they represented the largest peacetime economic intervention in U.S. history.</p>
+        </div>
+        <div class="source-context">
+          <p>Klein's claim that lockdown was "a period of unexpected prosperity for millions of workers" is supported by data: real median household income fell only slightly in 2020 despite the worst unemployment crisis since the Great Depression. The poverty rate actually declined in 2020 and 2021 due to transfers.</p>
+          <p>However, the programs were not without costs: record national debt expansion, inflationary pressures in 2022–2023, and significant fraud in PPP distribution (estimated $100–$200 billion in fraudulent loans). Klein's point about "unprecedented architecture of income support" is accurate but elides these costs.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          Klein uses COVID policy as his model for how society should respond to mass unemployment. Readers deserve to see the full policy record — what was done, what it cost, and what its distributional effects were — to evaluate whether it's replicable.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-china-shock">
+        <span class="source-type-badge badge-stat">Economic Research</span>
+        <div class="source-headline">The "China Shock" — ~2 Million Jobs Lost to Import Competition</div>
+        <div class="source-origin">David Autor, David Dorn, Gordon Hanson · Multiple papers, 2013–2021</div>
+        <div class="source-excerpt">
+          <p>Estimates of U.S. job losses from Chinese import competition post-2001 WTO accession range from 550,000 to 2.4 million. The Autor-Dorn-Hanson studies found concentrated devastation in specific communities, with lasting effects on wages, employment, and social outcomes — including increased mortality, opioid use, and political radicalization.</p>
+        </div>
+        <div class="source-context">
+          <p>Klein says "around two million jobs" — this is in the middle of the published estimate range. What he doesn't mention: a 2021 reassessment found consumer price benefits offset losses for most Americans, with only 6.3% experiencing net negative effects when accounting for lower prices. The aggregate effect may have been smaller than the headline numbers suggest.</p>
+          <p>The political aftermath is well-documented: the China Shock is associated with increased support for protectionist candidates in affected regions — a phenomenon that shaped the 2016 election. Klein's claim that "we did very, very little to help them" is broadly accurate; Trade Adjustment Assistance programs were widely seen as inadequate.</p>
+        </div>
+        <a class="source-link" href="https://en.wikipedia.org/wiki/China_shock" target="_blank">Wikipedia: China Shock ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          The "two million jobs" figure comes from specific academic research with a DOI. Readers should be able to read Autor et al.'s methodology and the subsequent replication debates — the number is contested.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-friendship-time">
+        <span class="source-type-badge badge-stat">Social Science Data</span>
+        <div class="source-headline">Time Spent With Friends — 12 Hours/Week (2003) → 5 Hours/Week (2024)</div>
+        <div class="source-origin">American Time Use Survey (BLS) · Jean Twenge research · Cigna Loneliness Index</div>
+        <div class="source-excerpt">
+          <p>The American Time Use Survey (ATUS) documents declining time spent with friends as a primary activity. Jean Twenge's research (<em>iGen</em>, 2017; subsequent papers) shows steep declines in in-person socializing among teens and young adults from the mid-2000s onward, correlating with smartphone adoption (2012 as a key inflection point).</p>
+        </div>
+        <div class="source-context">
+          <p>The 12-hours-to-5-hours statistic likely comes from the Survey Center on American Life or a synthesis of ATUS data. The decline is real but the 12 → 5 figure's exact source should be traceable. Note that time-use surveys measure self-reported or diary-based primary activities — "time with friends" is measured differently across studies.</p>
+          <p>Debate exists about causation: does smartphone/social media use cause social isolation, or do already-isolated people use social media more? Jonathan Haidt's <em>The Anxious Generation</em> (2024) argues the former; critics like Candice Odgers argue the correlation is weaker than Haidt claims.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          These are specific numbers Klein presents as established facts. The primary source for "12 hours in 2003" and "5 hours in 2024" should be named and linked — the measurement methodology significantly affects interpretation.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-dating-decline">
+        <span class="source-type-badge badge-stat">Survey Data</span>
+        <div class="source-headline">Teen Dating Decline — 80% (2000) → 46% (2024)</div>
+        <div class="source-origin">Monitoring the Future Survey (University of Michigan) · CDC Youth Risk Behavior Survey</div>
+        <div class="source-excerpt">
+          <p>Monitoring the Future, a longitudinal study of American youth behavior since 1975, tracks dating and romantic relationship formation. CDC's Youth Risk Behavior Survey also tracks teen relationship activity. Both show significant declines in dating and romantic activity among high school students since ~2000.</p>
+        </div>
+        <div class="source-context">
+          <p>The 80% → 46% figure aligns with Twenge's data synthesis. The decline accelerates after ~2012, coinciding with smartphone ubiquity. Proposed explanations: smartphones replacing in-person interaction, dating apps making romantic norms more performance-oriented, increased anxiety and risk-aversion, helicopter parenting reducing unsupervised teen time.</p>
+          <p>This trend is alarming regardless of AI: the dating decline was well-established before large language models existed. Klein's implied connection to AI ("A.I. could be a handmaiden of this social dissolution") is speculative about future effects, not a documented current causal relationship.</p>
+        </div>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          This is a specific, falsifiable statistic. The surveys that document it (MTF, YRBS) are publicly accessible. The exact survey question and response categories matter for interpretation.
+        </div>
+      </div>
+
+      <div class="source-card" id="src-gen-z-sex">
+        <span class="source-type-badge badge-stat">Survey Data</span>
+        <div class="source-headline">Gen Z Sexual Inactivity — ~25% Report No Sex in Past Year</div>
+        <div class="source-origin">General Social Survey (NORC/University of Chicago) · CDC BRFSS</div>
+        <div class="source-excerpt">
+          <p>The General Social Survey (GSS), conducted annually since 1972, tracks sexual frequency. The share of adults under 30 reporting no sex in the past year rose from ~8% in 2000 to ~28% by the early 2020s — with the increase concentrated among young men. CDC behavioral surveys corroborate the trend.</p>
+        </div>
+        <div class="source-context">
+          <p>The GSS data is robust: it's been collected consistently for 50+ years by NORC at the University of Chicago. The trend is real and significant. Proposed explanations: delayed marriage, economic precarity (fewer men in stable jobs = fewer eligible partners), smartphone displacement of in-person meeting, and cultural shifts in how relationships form.</p>
+          <p>The gender dimension is important: the increase in sexual inactivity is disproportionately concentrated among young men, while young women's rates have been more stable. Klein doesn't mention this — it complicates the "AI as social dissolution handmaiden" framing, since the trend predates AI and has specific gendered dynamics.</p>
+        </div>
+        <a class="source-link" href="https://en.wikipedia.org/wiki/General_Social_Survey" target="_blank">General Social Survey (Wikipedia) ↗</a>
+        <div class="why-linked">
+          <strong>Why this deserves a hyperlink</strong>
+          The GSS is a specific, named survey with publicly accessible data. The "quarter of Gen Z" figure is sourced from there. The gender asymmetry in the data significantly nuances Klein's framing.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nelson-note">
+      Ted Nelson's Xanadu vision (1960s) proposed that all documents link bidirectionally to their sources — every claim traceable to its origin, every quotation connected to its context. Standard web hypertext (HTML) only implements half of his vision: one-way links, no transclusion, no parallel displays. This page is a rough approximation of the other half.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const links = document.querySelectorAll('.hlink');
+  const emptyState = document.getElementById('emptyState');
+  const allCards = document.querySelectorAll('.source-card');
+  const sourcePanel = document.querySelector('.source-panel-inner');
+
+  let activeId = null;
+
+  // Map source IDs to card IDs
+  const sourceMap = {
+    'quinnipiac':        'src-quinnipiac',
+    'amodei':            'src-amodei',
+    'amodei-quote':      'src-amodei-quote',
+    'suleyman':          'src-suleyman',
+    'suleyman-quote':    'src-suleyman-quote',
+    'openai-policy':     'src-openai-policy',
+    'tech-layoffs':      'src-tech-layoffs',
+    'unemployment-rate': 'src-unemployment-rate',
+    'claude-code':       'src-claude-code',
+    'imas-essay':        'src-imas-essay',
+    'imas':              'src-imas',
+    'scarcity-knowledge':'src-scarcity-knowledge',
+    'relational-economy':'src-relational-economy',
+    'nespresso':         'src-nespresso',
+    'imas-scarcity-meaning': 'src-imas-scarcity-meaning',
+    'visicalc':          'src-visicalc',
+    'maksymov-quote':    'src-maksymov-quote',
+    'maksymov':          'src-maksymov',
+    'jevons':            'src-jevons',
+    'jevons-person':     'src-jevons-person',
+    'computers-employment': 'src-computers-employment',
+    'ai-productivity-studies': 'src-ai-productivity-studies',
+    'mollick':           'src-mollick',
+    'mollick-test':      'src-mollick-test',
+    'covid-relief':      'src-covid-relief',
+    'china-shock':       'src-china-shock',
+    'friendship-time':   'src-friendship-time',
+    'dating-decline':    'src-dating-decline',
+    'gen-z-sex':         'src-gen-z-sex',
+  };
+
+  links.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const sourceKey = this.dataset.source;
+      const cardId = sourceMap[sourceKey];
+      if (!cardId) return;
+
+      // If clicking same link, toggle off
+      if (activeId === cardId) {
+        deactivateAll();
+        return;
+      }
+
+      // Deactivate all
+      deactivateAll();
+
+      // Activate this link
+      this.classList.add('active');
+      activeId = cardId;
+
+      // Hide empty state, show card
+      emptyState.style.display = 'none';
+      const card = document.getElementById(cardId);
+      if (card) {
+        card.classList.add('visible');
+        // Scroll source panel to top
+        sourcePanel.parentElement.scrollTop = 0;
+      }
+    });
+  });
+
+  // Click outside deactivates
+  document.querySelector('.article-panel').addEventListener('click', function(e) {
+    if (!e.target.classList.contains('hlink')) {
+      deactivateAll();
+    }
+  });
+
+  function deactivateAll() {
+    activeId = null;
+    links.forEach(l => l.classList.remove('active'));
+    allCards.forEach(c => c.classList.remove('visible'));
+    emptyState.style.display = 'flex';
+  }
+</script>
+</body>
+</html>
