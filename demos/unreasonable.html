@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On the Unreasonable Effectiveness of Mathematics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0a0f;
+    color: #e8e8f0;
+    font-family: 'Georgia', serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 28px 12px;
+    background: linear-gradient(180deg, #0a0a0f 70%, transparent);
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  #header h1 {
+    font-size: 15px;
+    font-weight: normal;
+    letter-spacing: 0.08em;
+    color: #a0a0c0;
+    text-transform: uppercase;
+  }
+
+  #header p {
+    font-size: 11px;
+    color: #555570;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  #hint {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: #44445a;
+    letter-spacing: 0.07em;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  #graph {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .node circle {
+    cursor: pointer;
+    transition: r 0.2s;
+  }
+
+  .node text {
+    cursor: pointer;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .link {
+    fill: none;
+    stroke-opacity: 0.35;
+  }
+
+  /* Panel */
+  #panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 420px;
+    height: 100vh;
+    background: #0e0e18;
+    border-left: 1px solid #1e1e30;
+    padding: 64px 28px 28px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 200;
+  }
+
+  #panel.open {
+    transform: translateX(0);
+  }
+
+  #panel-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: none;
+    border: none;
+    color: #555570;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+  }
+
+  #panel-close:hover { color: #a0a0c0; }
+
+  #panel-category {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+    font-family: monospace;
+  }
+
+  #panel-title {
+    font-size: 22px;
+    font-weight: normal;
+    line-height: 1.3;
+    color: #e8e8f8;
+    margin-bottom: 6px;
+  }
+
+  #panel-year {
+    font-size: 12px;
+    color: #555570;
+    margin-bottom: 20px;
+    font-family: monospace;
+  }
+
+  .equation-block {
+    background: #13131f;
+    border: 1px solid #1e1e30;
+    border-radius: 6px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+  }
+
+  .equation-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #555570;
+    margin-bottom: 10px;
+    font-family: monospace;
+  }
+
+  .eq-render {
+    text-align: center;
+    color: #c8c8e8;
+    min-height: 30px;
+  }
+
+  #panel-body {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #9090b0;
+  }
+
+  #panel-body p { margin-bottom: 12px; }
+
+  #panel-body strong { color: #c0c0d8; font-weight: normal; font-style: italic; }
+
+  .wigner-quote {
+    border-left: 2px solid #3030508a;
+    padding: 10px 14px;
+    margin: 16px 0;
+    font-size: 13px;
+    color: #7070a0;
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  .connected-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #444460;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    font-family: monospace;
+  }
+
+  .connected-chip {
+    display: inline-block;
+    background: #181828;
+    border: 1px solid #252540;
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #707090;
+    margin: 0 6px 6px 0;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .connected-chip:hover {
+    border-color: #404060;
+    color: #a0a0c0;
+  }
+
+  /* scrollbar */
+  #panel::-webkit-scrollbar { width: 4px; }
+  #panel::-webkit-scrollbar-track { background: transparent; }
+  #panel::-webkit-scrollbar-thumb { background: #1e1e30; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>On the Unreasonable Effectiveness of Mathematics in Natural Sciences</h1>
+  <p>Eugene P. Wigner &nbsp;·&nbsp; Richard Courant Lecture, NYU, May 11 1959 &nbsp;·&nbsp; Comm. Pure Appl. Math.</p>
+</div>
+
+<svg id="graph"></svg>
+
+<div id="hint">click a node to explore &nbsp;·&nbsp; drag to reposition &nbsp;·&nbsp; scroll to zoom</div>
+
+<div id="panel">
+  <button id="panel-close">×</button>
+  <div id="panel-category"></div>
+  <div id="panel-title"></div>
+  <div id="panel-year"></div>
+  <div id="equation-area"></div>
+  <div id="panel-body"></div>
+  <div id="connected-area"></div>
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+
+const nodes = [
+  {
+    id: "wigner",
+    label: "Wigner's Thesis",
+    group: "root",
+    r: 28,
+    color: "#6060c8",
+    year: "1959",
+    category: "Philosophy of Science",
+    equations: [],
+    body: `<p>In 1959, Eugene Wigner delivered what would become one of the most-cited essays in the philosophy of science. His central observation was startling in its simplicity: <strong>mathematics, developed for purely abstract reasons, keeps turning out to be indispensable for describing the physical world.</strong></p>
+<p>Wigner was not merely noting that math is useful. He was noting something deeper and more mysterious — that the <em>unreasonably precise</em> fit between abstract mathematical structures and empirical reality demands explanation, and that perhaps no fully satisfying explanation exists.</p>
+<div class="wigner-quote">"The miracle of the appropriateness of the language of mathematics for the formulation of the laws of physics is a wonderful gift which we neither understand nor deserve."</div>
+<p>He pointed to examples across the tree of science: complex numbers invented to solve cubics become essential for quantum mechanics; group theory, studied for pure elegance, turns out to govern particle symmetries; differential geometry, Riemann's pure abstraction, is exactly what Einstein needs for gravity.</p>
+<p>Explore the nodes below to see how this mystery plays out across physics, chemistry, and biology — where mathematical structures conceived in abstraction became the hidden skeleton of nature.</p>`,
+    connected: ["classical","quantum","relativity","stat_mech","em","chemistry","biology"]
+  },
+
+  // ── PHYSICS ────────────────────────────────────────────────
+  {
+    id: "classical",
+    label: "Classical Mechanics",
+    group: "physics",
+    r: 20,
+    color: "#4488cc",
+    year: "1687",
+    category: "Physics",
+    equations: [
+      { label: "Newton's Second Law", tex: "\\mathbf{F} = m\\ddot{\\mathbf{r}}" },
+      { label: "Euler–Lagrange Equation", tex: "\\frac{d}{dt}\\frac{\\partial L}{\\partial \\dot{q}} - \\frac{\\partial L}{\\partial q} = 0" },
+      { label: "Hamilton's Equations", tex: "\\dot{q} = \\frac{\\partial H}{\\partial p}, \\quad \\dot{p} = -\\frac{\\partial H}{\\partial q}" }
+    ],
+    body: `<p>Newton's laws of motion, published in the <em>Principia Mathematica</em> (1687), represent the first great mystery Wigner's thesis illuminates. The second law <strong>F = ma</strong> is deceptively simple — yet it encodes a deep claim: that nature is governed by second-order differential equations.</p>
+<p>Why should force produce <em>acceleration</em> (the second derivative of position) rather than velocity or jerk? There is no a priori reason. And yet second-order equations appear throughout nature, as if the universe has a preferred depth of temporal memory.</p>
+<p>The Lagrangian and Hamiltonian reformulations, developed by mathematicians pursuing elegant variational principles, turned out to be far more than notational improvements — they revealed the deep structure of symmetry that underlies conservation laws (Noether's theorem, 1915) and directly anticipated quantum mechanics.</p>
+<div class="wigner-quote">"The success of mathematics in describing physical reality is not just a tool of calculation but a fundamental feature of the world." — paraphrasing Wigner</div>
+<p>Hamiltonian mechanics, with its phase space and symplectic geometry, was mathematics looking for beauty. It found the skeleton of quantum theory instead.</p>`,
+    connected: ["wigner","quantum","stat_mech","chaos"]
+  },
+
+  {
+    id: "quantum",
+    label: "Quantum Mechanics",
+    group: "physics",
+    r: 22,
+    color: "#4488cc",
+    year: "1925–1926",
+    category: "Physics",
+    equations: [
+      { label: "Schrödinger Equation", tex: "i\\hbar\\frac{\\partial}{\\partial t}\\Psi = \\hat{H}\\Psi" },
+      { label: "Heisenberg Uncertainty", tex: "\\sigma_x \\sigma_p \\geq \\frac{\\hbar}{2}" },
+      { label: "Born Rule", tex: "P(x) = |\\Psi(x)|^2" }
+    ],
+    body: `<p>Quantum mechanics is Wigner's central exhibit. The theory is built from <strong>complex numbers</strong> — numbers with an imaginary component — which were invented in the 16th century to solve cubic equations, with no physical motivation whatsoever.</p>
+<p>The wavefunction Ψ is complex-valued, and the probability of observation is the squared modulus |Ψ|². This strange rule (the Born rule) works with extraordinary precision — QED predictions match experiment to 12 decimal places — yet nobody fully understands <em>why</em> the universe would use complex numbers as the substrate of probability.</p>
+<p><strong>Hilbert spaces</strong>, developed by David Hilbert for purely mathematical reasons around 1904, became the natural home of quantum states. <strong>Group theory</strong>, a branch of abstract algebra developed for studying symmetries of polynomials, turned out to classify all particles by their spin and charge. None of this was planned.</p>
+<div class="wigner-quote">"It is not at all natural that 'laws of nature' exist, much less that man is able to discover them. The miracle of the appropriateness of the language of mathematics is our starting point."</div>
+<p>Wigner himself made fundamental contributions here — Wigner's theorem on symmetry in quantum mechanics, and his classification of elementary particles by representations of the Poincaré group.</p>`,
+    connected: ["wigner","classical","qft","chemistry","relativity"]
+  },
+
+  {
+    id: "relativity",
+    label: "General Relativity",
+    group: "physics",
+    r: 20,
+    color: "#4488cc",
+    year: "1915",
+    category: "Physics",
+    equations: [
+      { label: "Einstein Field Equations", tex: "G_{\\mu\\nu} + \\Lambda g_{\\mu\\nu} = \\frac{8\\pi G}{c^4} T_{\\mu\\nu}" },
+      { label: "Geodesic Equation", tex: "\\frac{d^2 x^\\mu}{d\\tau^2} + \\Gamma^\\mu_{\\nu\\lambda}\\frac{dx^\\nu}{d\\tau}\\frac{dx^\\lambda}{d\\tau} = 0" }
+    ],
+    body: `<p>The most dramatic example in Wigner's essay: Bernhard Riemann developed his geometry of curved manifolds in 1854, in a lecture meant to impress Gauss. It was mathematics of the purest kind — curved multi-dimensional spaces with no known physical application.</p>
+<p>Sixty years later, Einstein needed exactly this machinery to describe gravity as spacetime curvature. Riemannian geometry was not merely useful — it was <strong>precisely the right language</strong>, the only language, that could express general relativity.</p>
+<p>The Einstein field equations relate the curvature of spacetime (left side, encoded in the Einstein tensor G_μν) to the distribution of mass and energy (right side, the stress-energy tensor T_μν). Solving them requires differential geometry, tensor calculus, and topology — all developed for abstract reasons decades before physics needed them.</p>
+<p>The cosmological constant Λ, which Einstein added and later called his "greatest blunder," was vindicated in 1998 when dark energy was discovered — the universe expands at an accelerating rate, precisely as Λ predicts.</p>`,
+    connected: ["wigner","quantum","qft","em"]
+  },
+
+  {
+    id: "em",
+    label: "Electromagnetism",
+    group: "physics",
+    r: 18,
+    color: "#4488cc",
+    year: "1865",
+    category: "Physics",
+    equations: [
+      { label: "Maxwell's Equations (differential form)", tex: "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\varepsilon_0}, \\quad \\nabla \\times \\mathbf{B} = \\mu_0 \\mathbf{J} + \\mu_0\\varepsilon_0\\frac{\\partial \\mathbf{E}}{\\partial t}" },
+      { label: "Wave Equation (from Maxwell)", tex: "\\nabla^2 \\mathbf{E} = \\mu_0 \\varepsilon_0 \\frac{\\partial^2 \\mathbf{E}}{\\partial t^2}" }
+    ],
+    body: `<p>Maxwell's equations unify electricity, magnetism, and light. But the Wigner moment here is subtle: Maxwell added a <strong>purely mathematical correction</strong> — the displacement current ∂E/∂t — to make his equations consistent, not because experiment demanded it.</p>
+<p>From that mathematical demand for consistency, he derived that electromagnetic disturbances propagate at speed c = 1/√(μ₀ε₀) — which he recognized as the speed of light. Light itself was a prediction of mathematical self-consistency, not observation.</p>
+<p>The differential forms language (∇·, ∇×) was developed by Grassmann and others for geometric reasons. Maxwell's equations written in this language reveal their true structure: they are a single equation dF = 0 and d★F = J in the language of differential forms, a mathematical structure connecting to the deepest ideas in topology.</p>
+<p>This mathematical structure — a gauge field — later became the template for the entire Standard Model of particle physics.</p>`,
+    connected: ["wigner","qft","relativity","classical"]
+  },
+
+  {
+    id: "stat_mech",
+    label: "Statistical Mechanics",
+    group: "physics",
+    r: 17,
+    color: "#4488cc",
+    year: "1872",
+    category: "Physics",
+    equations: [
+      { label: "Boltzmann Entropy", tex: "S = k_B \\ln W" },
+      { label: "Partition Function", tex: "Z = \\sum_i e^{-E_i / k_B T}" },
+      { label: "Maxwell–Boltzmann Distribution", tex: "f(v) = 4\\pi n\\left(\\frac{m}{2\\pi k_B T}\\right)^{3/2} v^2 e^{-mv^2/2k_BT}" }
+    ],
+    body: `<p>Statistical mechanics bridges the microscopic (atoms) and macroscopic (temperature, pressure) using <strong>probability theory</strong> — mathematics developed to understand gambling, not gases.</p>
+<p>Boltzmann's entropy formula S = k_B ln W, engraved on his tombstone, says that entropy is the logarithm of the number of microscopic configurations consistent with a macroscopic state. Logarithms appear here because they convert multiplication of probabilities into addition — a mathematical convenience that turns out to be physically fundamental.</p>
+<p>The exponential Boltzmann factor e^{-E/kT} appears everywhere in nature: chemical reaction rates, population inversions in lasers, semiconductor carrier concentrations, protein folding equilibria. It comes from maximizing entropy subject to a constraint — a purely mathematical optimization that nature appears to solve exactly.</p>
+<p>Shannon's information entropy (1948), defined for communication theory, is mathematically identical to Boltzmann's entropy. The same formula governs information in computers and heat in steam engines — a mathematical coincidence that implies something deep about the nature of both.</p>`,
+    connected: ["wigner","classical","chemistry","biology","chaos"]
+  },
+
+  {
+    id: "qft",
+    label: "Quantum Field Theory",
+    group: "physics",
+    r: 19,
+    color: "#4488cc",
+    year: "1927–1948",
+    category: "Physics",
+    equations: [
+      { label: "Dirac Equation", tex: "(i\\gamma^\\mu \\partial_\\mu - m)\\psi = 0" },
+      { label: "QED Lagrangian", tex: "\\mathcal{L} = \\bar{\\psi}(i\\gamma^\\mu D_\\mu - m)\\psi - \\frac{1}{4}F_{\\mu\\nu}F^{\\mu\\nu}" }
+    ],
+    body: `<p>QFT is where the unreasonable effectiveness reaches its apex. The Dirac equation was derived by Dirac in 1928 by demanding that the Schrödinger equation be consistent with special relativity — a mathematical constraint.</p>
+<p>The equation required a 4-component object (a spinor) rather than a scalar wavefunction. Mathematically, this implied the existence of a particle identical to the electron but with opposite charge. Dirac hesitated to publish this prediction. In 1932, Carl Anderson discovered the positron — the antiparticle Dirac's math had already found.</p>
+<p><strong>Antimatter was predicted by a mathematical consistency requirement.</strong> This is perhaps the purest example of Wigner's thesis in all of physics.</p>
+<p>The Standard Model Lagrangian is constructed entirely from symmetry principles — SU(3) × SU(2) × U(1) gauge symmetry — which are abstract group-theoretic requirements. The particles of nature (quarks, leptons, bosons) are simply the representations of these groups. The universe seems to be doing group theory.</p>`,
+    connected: ["quantum","relativity","em","symmetry"]
+  },
+
+  {
+    id: "chaos",
+    label: "Chaos & Nonlinear Dynamics",
+    group: "physics",
+    r: 15,
+    color: "#4488cc",
+    year: "1963",
+    category: "Physics",
+    equations: [
+      { label: "Lorenz System", tex: "\\dot{x} = \\sigma(y - x), \\quad \\dot{y} = x(\\rho - z) - y, \\quad \\dot{z} = xy - \\beta z" },
+      { label: "Logistic Map", tex: "x_{n+1} = r x_n(1 - x_n)" }
+    ],
+    body: `<p>Chaos theory reveals a different facet of mathematical effectiveness: the same simple equations that describe fluid convection (Lorenz, 1963) describe population dynamics, electrical circuits, and heartbeat irregularities.</p>
+<p>Edward Lorenz discovered chaotic behavior while running a weather simulation — he entered a rounded value and the trajectory diverged completely. This sensitivity to initial conditions (the "butterfly effect") was not a bug but a fundamental mathematical property of nonlinear dynamical systems.</p>
+<p>The logistic map x_{n+1} = rx_n(1-x_n), a simple difference equation modeling population growth, undergoes a <strong>period-doubling cascade</strong> to chaos as r increases. Feigenbaum discovered (1975) that the ratio of successive period-doublings converges to a universal constant δ ≈ 4.669...</p>
+<p>This Feigenbaum constant appears in completely unrelated physical systems: fluid turbulence, electronic circuits, chemical oscillators. A number from pure iteration theory is a universal constant of nature. Wigner would have been delighted.</p>`,
+    connected: ["classical","stat_mech","biology"]
+  },
+
+  {
+    id: "symmetry",
+    label: "Symmetry & Group Theory",
+    group: "math",
+    r: 18,
+    color: "#8855cc",
+    year: "1832 / 1872",
+    category: "Mathematics",
+    equations: [
+      { label: "Noether's Theorem", tex: "\\text{symmetry} \\leftrightarrow \\text{conservation law}" },
+      { label: "Group Axioms", tex: "\\exists e: ae=ea=a, \\quad \\exists a^{-1}: aa^{-1}=e" },
+      { label: "Representation", tex: "\\rho: G \\to GL(V), \\quad \\rho(gh) = \\rho(g)\\rho(h)" }
+    ],
+    body: `<p>Group theory was born when Évariste Galois, the night before his fatal duel in 1832, wrote down the mathematics of why quintic equations have no general algebraic solution. The groups he defined were purely combinatorial objects — permutations of roots.</p>
+<p>Felix Klein's Erlangen Program (1872) proposed using group theory to classify geometries. This was pure mathematics with no physical agenda.</p>
+<p>Then: every fundamental conservation law in physics turns out to be a consequence of a symmetry (Noether's theorem, 1915). Time-translation symmetry → energy conservation. Spatial symmetry → momentum conservation. Rotational symmetry → angular momentum conservation.</p>
+<p>The particles of the Standard Model are classified by representations of Lie groups — SU(2), SU(3), U(1). These are abstract algebraic structures. Yet every particle ever discovered fits into this classification scheme perfectly. The mathematics of symmetry is literally the mathematics of matter.</p>
+<p>Wigner's own Nobel Prize (1963) was for recognizing that symmetry principles, via group representations, dictate the structure of quantum mechanics itself.</p>`,
+    connected: ["qft","quantum","chemistry","relativity"]
+  },
+
+  // ── CHEMISTRY ──────────────────────────────────────────────
+  {
+    id: "chemistry",
+    label: "Quantum Chemistry",
+    group: "chemistry",
+    r: 19,
+    color: "#cc8844",
+    year: "1926–",
+    category: "Chemistry",
+    equations: [
+      { label: "Schrödinger for Hydrogen", tex: "-\\frac{\\hbar^2}{2m}\\nabla^2\\psi - \\frac{e^2}{4\\pi\\varepsilon_0 r}\\psi = E\\psi" },
+      { label: "Born–Oppenheimer Approximation", tex: "\\Psi_{total} \\approx \\psi_{elec}(\\mathbf{r};\\mathbf{R}) \\cdot \\chi_{nuc}(\\mathbf{R})" }
+    ],
+    body: `<p>The periodic table, organized empirically by Mendeleev in 1869, gains its full explanation only through quantum mechanics. The shells and subshells (s, p, d, f) correspond exactly to solutions of the Schrödinger equation for a hydrogen-like atom — spherical harmonics, another piece of 19th-century mathematics developed for heat flow, not atoms.</p>
+<p>The aufbau principle, Hund's rules, and the Pauli exclusion principle all follow from the abstract mathematics of antisymmetric wavefunctions (fermions must have antisymmetric states under particle exchange — a group-theoretic requirement).</p>
+<p>Chemical bonding — why atoms form molecules — is explained by the Schrödinger equation finding energy minima when electron probability clouds overlap in certain configurations. The covalent bond is a quantum mechanical interference effect.</p>
+<p>Density Functional Theory (DFT), now the workhorse of computational chemistry, is based on the Hohenberg-Kohn theorem: the ground-state electron density uniquely determines all properties of the system. This is a mathematical existence theorem that transformed chemistry into a computational science.</p>`,
+    connected: ["wigner","quantum","symmetry","biology","thermo"]
+  },
+
+  {
+    id: "thermo",
+    label: "Thermodynamics",
+    group: "chemistry",
+    r: 16,
+    color: "#cc8844",
+    year: "1824–1865",
+    category: "Chemistry / Physics",
+    equations: [
+      { label: "Gibbs Free Energy", tex: "\\Delta G = \\Delta H - T\\Delta S" },
+      { label: "Clausius Inequality", tex: "dS \\geq \\frac{\\delta Q}{T}" },
+      { label: "Arrhenius Equation", tex: "k = A e^{-E_a / RT}" }
+    ],
+    body: `<p>Thermodynamics predates atomic theory — Carnot, Clausius, and Kelvin developed it without knowing about atoms. They were doing macroscopic phenomenology. Yet the mathematics they discovered (entropy, free energy, chemical potential) turned out to describe microscopic reality perfectly once statistical mechanics arrived.</p>
+<p>The Gibbs free energy ΔG = ΔH - TΔS determines whether a chemical reaction proceeds spontaneously. It balances two mathematical quantities — enthalpy (energy) and entropy (disorder) — weighted by temperature. This one equation governs all of chemistry's spontaneity.</p>
+<p>The Arrhenius equation e^{-Ea/RT} governs reaction rates. The Boltzmann exponential factor appears again: reactions proceed when thermal fluctuations provide enough energy to cross an activation barrier. The same mathematical form appears in semiconductor physics, protein folding rates, and material failure under stress.</p>
+<p>Wigner would note: thermodynamics was developed for steam engines, yet the same mathematical structure governs black hole entropy, information theory, and biological metabolism. The universality of the mathematics seems to point to something fundamental about the structure of reality.</p>`,
+    connected: ["stat_mech","chemistry","biology"]
+  },
+
+  // ── BIOLOGY ────────────────────────────────────────────────
+  {
+    id: "biology",
+    label: "Mathematical Biology",
+    group: "biology",
+    r: 18,
+    color: "#44aa66",
+    year: "1952–",
+    category: "Biology",
+    equations: [
+      { label: "Lotka–Volterra (predator–prey)", tex: "\\frac{dx}{dt} = \\alpha x - \\beta xy, \\quad \\frac{dy}{dt} = \\delta xy - \\gamma y" },
+      { label: "Turing Reaction–Diffusion", tex: "\\frac{\\partial u}{\\partial t} = D_u \\nabla^2 u + f(u,v)" }
+    ],
+    body: `<p>Biology long resisted mathematical description — life seemed too messy, too contingent, too historical. Then Alan Turing (1952) proposed that the patterns on animal skins — leopard spots, zebra stripes, fish markings — arise from a <strong>reaction-diffusion</strong> mechanism governed by partial differential equations.</p>
+<p>Two chemical species, an activator and an inhibitor, diffuse at different rates and react. The mathematics of diffusion (the heat equation, developed to describe metal cooling) generates biological pattern from homogeneity. The spots and stripes of the animal kingdom emerge from an instability in Turing's equations.</p>
+<p>The Lotka-Volterra equations describe predator-prey cycles: populations oscillate in the phase plane, cycling forever around a fixed point. This simple ODE system was developed independently by Lotka (for chemical oscillators, 1910) and Volterra (for fish populations, 1926). The same mathematics governs both.</p>
+<p>Wigner's mystery deepens in biology: evolution produces organisms, and organisms obey mathematics, even though evolution has no foresight and mathematics has no biological agenda. Why should natural selection produce creatures that are described by differential equations?</p>`,
+    connected: ["wigner","stat_mech","chemistry","evolution","neuroscience"]
+  },
+
+  {
+    id: "evolution",
+    label: "Population Genetics",
+    group: "biology",
+    r: 14,
+    color: "#44aa66",
+    year: "1908–1930",
+    category: "Biology",
+    equations: [
+      { label: "Hardy–Weinberg Equilibrium", tex: "p^2 + 2pq + q^2 = 1" },
+      { label: "Fisher's Fundamental Theorem", tex: "\\frac{d\\bar{w}}{dt} = \\frac{\\text{Var}(w)}{\\bar{w}}" }
+    ],
+    body: `<p>Population genetics is where Darwin's theory of evolution meets Mendel's mathematics of heredity. The synthesis, achieved in the 1930s by Fisher, Haldane, and Wright, showed that natural selection is a mathematical process acting on gene frequency distributions.</p>
+<p>The Hardy-Weinberg principle (1908) shows that allele frequencies remain stable across generations under random mating — a simple quadratic identity that follows from nothing more than the combinatorics of diploid reproduction. Evolution requires deviation from this baseline.</p>
+<p>Fisher's fundamental theorem of natural selection (1930) states that the rate of increase of mean fitness equals the additive genetic variance in fitness. This is a mathematical theorem about evolving populations, analogous in structure to the second law of thermodynamics.</p>
+<p>R.A. Fisher was also one of the founders of modern statistics — he developed maximum likelihood, analysis of variance, and experimental design. He saw no separation between the mathematics of genetics, statistics, and thermodynamics: they were instances of the same underlying structure.</p>`,
+    connected: ["biology","stat_mech","chaos"]
+  },
+
+  {
+    id: "neuroscience",
+    label: "Computational Neuroscience",
+    group: "biology",
+    r: 15,
+    color: "#44aa66",
+    year: "1952–",
+    category: "Biology",
+    equations: [
+      { label: "Hodgkin–Huxley Model", tex: "C_m \\frac{dV}{dt} = -g_{Na}m^3h(V-E_{Na}) - g_K n^4(V-E_K) - g_L(V-E_L) + I" },
+      { label: "Integrate-and-Fire Neuron", tex: "\\tau_m \\frac{dV}{dt} = -(V - V_{rest}) + R_m I(t)" }
+    ],
+    body: `<p>The Hodgkin-Huxley model (1952) describes the generation and propagation of nerve impulses using a system of differential equations fit to voltage-clamp experiments on squid axons. It won the Nobel Prize in 1963 — the same year as Wigner's.</p>
+<p>The model treats ion channels as conductances governed by gating variables (m, h, n) that obey first-order ODEs. The action potential — the electrical spike that carries neural information — emerges as a solution to this system. The mathematics of electrical circuits (devised for wires and resistors) describes the language of thought.</p>
+<p>The integrate-and-fire neuron, a simplification, is exactly the mathematics of a leaky capacitor charging to threshold. Neural computation, at this level, is analog electrical engineering described by the same equations Kirchhoff wrote down for telegraph lines.</p>
+<p>Deeper still: the brain seems to perform Bayesian inference — probabilistic reasoning that follows from the axioms of probability theory, which are pure mathematics. Perception as probabilistic computation is described by mathematics developed for games of chance, not for brains.</p>`,
+    connected: ["biology","chaos","stat_mech"]
+  }
+];
+
+const links = [
+  { source: "wigner", target: "classical" },
+  { source: "wigner", target: "quantum" },
+  { source: "wigner", target: "relativity" },
+  { source: "wigner", target: "stat_mech" },
+  { source: "wigner", target: "em" },
+  { source: "wigner", target: "chemistry" },
+  { source: "wigner", target: "biology" },
+  { source: "classical", target: "quantum" },
+  { source: "classical", target: "stat_mech" },
+  { source: "classical", target: "chaos" },
+  { source: "quantum", target: "qft" },
+  { source: "quantum", target: "chemistry" },
+  { source: "quantum", target: "relativity" },
+  { source: "relativity", target: "qft" },
+  { source: "relativity", target: "em" },
+  { source: "em", target: "qft" },
+  { source: "stat_mech", target: "chaos" },
+  { source: "stat_mech", target: "chemistry" },
+  { source: "stat_mech", target: "biology" },
+  { source: "qft", target: "symmetry" },
+  { source: "symmetry", target: "quantum" },
+  { source: "symmetry", target: "chemistry" },
+  { source: "chemistry", target: "biology" },
+  { source: "chemistry", target: "thermo" },
+  { source: "thermo", target: "stat_mech" },
+  { source: "thermo", target: "biology" },
+  { source: "biology", target: "evolution" },
+  { source: "biology", target: "neuroscience" },
+  { source: "evolution", target: "stat_mech" },
+  { source: "chaos", target: "biology" },
+  { source: "neuroscience", target: "chaos" },
+];
+
+// ─── COLOR MAP ────────────────────────────────────────────────
+const groupColor = {
+  root:      "#6060c8",
+  physics:   "#4488cc",
+  chemistry: "#cc8844",
+  biology:   "#44aa66",
+  math:      "#8855cc",
+};
+
+// ─── D3 SETUP ─────────────────────────────────────────────────
+const svg = d3.select("#graph");
+const W = window.innerWidth, H = window.innerHeight;
+svg.attr("width", W).attr("height", H);
+
+const g = svg.append("g");
+
+// Zoom
+svg.call(d3.zoom().scaleExtent([0.3, 3]).on("zoom", e => g.attr("transform", e.transform)));
+
+// Simulation
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
+    if (d.source.id === "wigner" || d.target.id === "wigner") return 170;
+    return 120;
+  }).strength(0.4))
+  .force("charge", d3.forceManyBody().strength(-500))
+  .force("center", d3.forceCenter(W / 2, H / 2))
+  .force("collision", d3.forceCollide(d => d.r + 18));
+
+// Links
+const linkSel = g.append("g").selectAll("line")
+  .data(links).join("line")
+  .attr("class", "link")
+  .attr("stroke", d => {
+    const src = nodes.find(n => n.id === (d.source.id || d.source));
+    return src ? groupColor[src.group] : "#444";
+  })
+  .attr("stroke-width", 1);
+
+// Nodes
+const nodeSel = g.append("g").selectAll("g")
+  .data(nodes).join("g")
+  .attr("class", "node")
+  .call(d3.drag()
+    .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on("drag",  (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on("end",   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+  )
+  .on("click", (e, d) => openPanel(d));
+
+nodeSel.append("circle")
+  .attr("r", d => d.r)
+  .attr("fill", d => d.color + "22")
+  .attr("stroke", d => d.color)
+  .attr("stroke-width", d => d.id === "wigner" ? 2.5 : 1.5);
+
+nodeSel.append("text")
+  .text(d => d.label)
+  .attr("text-anchor", "middle")
+  .attr("dy", d => d.r + 14)
+  .attr("font-size", d => d.id === "wigner" ? 13 : 11)
+  .attr("fill", d => d.color)
+  .attr("opacity", 0.9);
+
+sim.on("tick", () => {
+  linkSel
+    .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+  nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+// ─── PANEL ────────────────────────────────────────────────────
+const panel = document.getElementById("panel");
+const panelClose = document.getElementById("panel-close");
+
+panelClose.addEventListener("click", () => {
+  panel.classList.remove("open");
+  resetHighlight();
+});
+
+let currentNode = null;
+
+function openPanel(d) {
+  currentNode = d;
+  document.getElementById("panel-category").textContent = d.category;
+  document.getElementById("panel-category").style.color = groupColor[d.group];
+  document.getElementById("panel-title").textContent = d.label;
+  document.getElementById("panel-year").textContent = d.year ? `c. ${d.year}` : "";
+
+  // Equations
+  const eqArea = document.getElementById("equation-area");
+  eqArea.innerHTML = "";
+  if (d.equations && d.equations.length) {
+    d.equations.forEach(eq => {
+      const block = document.createElement("div");
+      block.className = "equation-block";
+      block.innerHTML = `<div class="equation-label">${eq.label}</div><div class="eq-render" id="eq-${Math.random().toString(36).slice(2)}">\\[${eq.tex}\\]</div>`;
+      eqArea.appendChild(block);
+    });
+  }
+
+  // Body
+  document.getElementById("panel-body").innerHTML = d.body;
+
+  // Connected nodes
+  const connArea = document.getElementById("connected-area");
+  if (d.connected && d.connected.length) {
+    const connNodes = d.connected.map(cid => nodes.find(n => n.id === cid)).filter(Boolean);
+    connArea.innerHTML = `<div class="connected-label">Connected</div>` +
+      connNodes.map(cn => `<span class="connected-chip" data-id="${cn.id}" style="border-color:#252540;color:${groupColor[cn.group]}88">${cn.label}</span>`).join("");
+    connArea.querySelectorAll(".connected-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const target = nodes.find(n => n.id === chip.dataset.id);
+        if (target) openPanel(target);
+      });
+    });
+  } else {
+    connArea.innerHTML = "";
+  }
+
+  panel.classList.add("open");
+  highlightNode(d);
+
+  // Typeset math
+  if (window.MathJax) {
+    MathJax.typesetPromise([eqArea]).catch(console.error);
+  }
+}
+
+function highlightNode(d) {
+  const connectedIds = new Set(d.connected || []);
+  connectedIds.add(d.id);
+
+  nodeSel.selectAll("circle")
+    .attr("opacity", n => connectedIds.has(n.id) ? 1 : 0.2)
+    .attr("stroke-width", n => n.id === d.id ? 3 : 1.5);
+
+  linkSel
+    .attr("opacity", l => {
+      const sid = l.source.id || l.source;
+      const tid = l.target.id || l.target;
+      return (sid === d.id || tid === d.id) ? 0.8 : 0.05;
+    })
+    .attr("stroke-width", l => {
+      const sid = l.source.id || l.source;
+      const tid = l.target.id || l.target;
+      return (sid === d.id || tid === d.id) ? 2 : 1;
+    });
+
+  nodeSel.selectAll("text")
+    .attr("opacity", n => connectedIds.has(n.id) ? 1 : 0.15);
+}
+
+function resetHighlight() {
+  nodeSel.selectAll("circle").attr("opacity", 1).attr("stroke-width", d => d.id === "wigner" ? 2.5 : 1.5);
+  linkSel.attr("opacity", 0.35).attr("stroke-width", 1);
+  nodeSel.selectAll("text").attr("opacity", 0.9);
+}
+
+// Open wigner node on load after simulation settles
+setTimeout(() => openPanel(nodes[0]), 900);
+</script>
+</body>
+</html>
