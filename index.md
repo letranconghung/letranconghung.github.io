@@ -17,7 +17,7 @@ I am also interested in the theoretical foundations of RL, because I love robots
 
 My email is tchle [at] princeton [dot] edu
 
-I am currently trying to play jazz on the piano and to write a decent chuckleable stand-up routine.
+I am currently trying to play jazz on the piano and to write a chuckleable stand-up routine.
 
 # Updates
 <ul class="pub-list">
