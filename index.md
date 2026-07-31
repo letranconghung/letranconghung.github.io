@@ -9,7 +9,7 @@ avatar: /assets/images/headshot.jpg
 #     url: "https://github.com/letranconghung"
 ---
 # About me
-I'm Hung, a first-year PhD student at Princeton ORFE. I'm currently interested in deep learning theory (broadly interpreted), as inspired by [Misha Belkin's](http://misha.belkin-wang.org/) blog posts on the necessity of developing such a thing and [Becca Willett's](https://willett.psd.uchicago.edu/research/) motivation.
+I'm Hung, a first-year PhD student at Princeton ORFE. I'm currently interested in deep learning theory broadly interpreted, as inspired by [Misha Belkin's](http://misha.belkin-wang.org/) blog posts on the necessity of developing such a thing and [Becca Willett's](https://willett.psd.uchicago.edu/research/) motivation.
 
 I previously graduated from the University of Chicago with a B.S. in Mathematics, where I mainly spent my time on probability theory, some statistical learning theory, and a lot of RL for robotics. During this time I was fortunate to learn from and work with Ewain Gwynne, Matt Walter, Yuxin Chen, Shiry Ginosar, and Kaylene Stocking.
 
