@@ -8,38 +8,48 @@ avatar: /assets/images/headshot.jpg
 #   - label: "GitHub"
 #     url: "https://github.com/letranconghung"
 ---
+
 # About me
-I'm Hung, a first-year PhD student at Princeton ORFE. I'm currently interested in deep learning theory broadly interpreted, as inspired by [Misha Belkin's](http://misha.belkin-wang.org/) blog posts on the necessity of developing such a thing and [Becca Willett's](https://willett.psd.uchicago.edu/research/) motivation.
+
+I'm Hung, a first-year PhD student at Princeton ORFE. I'm currently interested in the theoretical foundations of deep learning broadly interpreted, as inspired by [Misha Belkin](https://mishabelkin.substack.com/p/the-necessity-of-machine-learning) and [Becca Willett](https://willett.psd.uchicago.edu/research/#:~:text=Research,-Investing%20in%20applied), as well as my own (painful) experiences of applying it.
 
 I previously graduated from the University of Chicago with a B.S. in Mathematics, where I mainly spent my time on probability theory, some statistical learning theory, and a lot of RL for robotics. During this time I was fortunate to learn from and work with Ewain Gwynne, Matt Walter, Yuxin Chen, Shiry Ginosar, and Kaylene Stocking.
 
-I am also interested in the theoretical foundations of RL, because I love robots.
+I am also interested in the theoretical foundations of RL, with a view towards applications in robotics.
 
-My email is tchle [at] princeton [dot] edu
+My email is tchle [at] princeton [dot] edu.
 
-I am currently trying to play jazz on the piano and to write a chuckleable stand-up routine.
+I am currently trying to play jazz on the piano and to write a chuckleatable stand-up routine.
 
 # Updates
+
 <ul class="pub-list">
   <li>
     <span class="pub-date">8/2026</span>
     <span class="pub-body">I'll be participating in the Princeton Machine Learning Theory Summer School!</span>
   </li>
+  <li>
+    <span class="pub-date">6/2026</span>
+    <span class="pub-body">I graduated from UChicago!</span>
+  </li>
 </ul>
 
 # Papers
+
 <ul class="pub-list">
   <li>
     <span class="pub-date">2/2025</span>
     <span class="pub-body">
-      <span class="pub-title">Active Advantage-Aligned Online Reinforcement Learning with Offline Data</span>
-      <span class="pub-authors">Xuefeng Liu, <strong>Hung T. C. Le</strong>, Siyu Chen, Rick Stevens, Zhuoran Yang, Matthew R. Walter, Yuxin Chen</span>
+    <span class="pub-title">Active Advantage-Aligned Online Reinforcement Learning with Offline Data</span>
+    <span class="pub-authors">Xuefeng Liu, <strong>Hung T. C. Le</strong>, Siyu Chen, Rick Stevens, Zhuoran Yang, Matthew R. Walter, Yuxin Chen</span>
+    <span class="pub-meta">Exploration in AI Today (EXAIT) Workshop at ICML 2025</span>
     </span>
     <span class="pub-links"><a class="pub-link" href="https://arxiv.org/abs/2502.07937">arXiv</a></span>
   </li>
 </ul>
 
 # Expositions
+
 <ul class="pub-list">
   <li>
     <span class="pub-date">11/2025</span>
@@ -64,7 +74,7 @@ I am currently trying to play jazz on the piano and to write a chuckleable stand
     <span class="pub-body">
       <span class="pub-title">Risk-averse Dynamic Programming for Tree-based Controlled Markov Decision Processes</span>
       <span class="pub-authors">Cole Franklin*, Denisse Garnica*, <strong>Hung T. C. Le*</strong>, Benjamin May*</span>
-      <span class="pub-meta">FUSRP 2024</span>
+      <span class="pub-meta">Fields Undergraduate Summer Research Program 2024</span>
     </span>
     <span class="pub-links"><a class="pub-link" href="../assets/pdf/Risk-averse%20dynamic%20programming%20for%20tree-based%20controlled%20Markov%20decision%20processes.pdf">pdf</a></span>
   </li>

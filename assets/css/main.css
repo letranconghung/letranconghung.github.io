@@ -86,6 +86,7 @@ a:hover {
 .content h1 {
   font-size: 1.4rem;
   margin-top: 2.5rem;
+  margin-bottom: 0.3rem;
   padding-bottom: 0.3rem;
   border-bottom: 1px solid var(--border);
 }
@@ -147,13 +148,14 @@ a:hover {
 
 .pub-list li {
   display: flex;
+  align-items: flex-start;
   gap: 1.25rem;
   padding: 0.65rem 0;
   border-bottom: 1px solid var(--border);
 }
 
 .pub-list li:first-child {
-  padding-top: 0.3rem;
+  /* padding-top: 0.3rem; */
 }
 
 .pub-list li:last-child {
@@ -163,7 +165,8 @@ a:hover {
 .pub-date {
   flex: 0 0 4rem;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.7rem;
+  line-height: 1.63rem;
 }
 
 .pub-body {
