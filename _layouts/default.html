@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="{{ site.locale | default: 'en-US' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} &middot; {% endif %}{{ site.title }}</title>
+  {% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+</head>
+<body>
+  <div class="page">
+    {{ content }}
+  </div>
+</body>
+</html>

@@ -1,0 +1,215 @@
+:root {
+  color-scheme: light dark;
+  --text: #1a1a1a;
+  --muted: #5a5a5a;
+  --link: #1a4fa0;
+  --border: #e3e3e3;
+  --bg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e6e6e6;
+    --muted: #a3a3a3;
+    --link: #7aa7ff;
+    --border: #333333;
+    --bg: #14151a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 0.75rem 5rem;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.avatar {
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.header-text {
+  margin-top: 1rem;
+}
+
+.header-text h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.links {
+  margin: 0.4rem 0 0;
+  font-size: 0.95rem;
+}
+
+.content {
+  font-size: 1.05rem;
+}
+
+.content h1 {
+  font-size: 1.4rem;
+  margin-top: 2.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.content h2 {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+}
+
+.content p {
+  margin: 0.9rem 0;
+}
+
+.content ul,
+.content ol {
+  padding-left: 1.4rem;
+}
+
+.content ul.pub-list {
+  padding-left: 0;
+}
+
+.content img {
+  max-width: 100%;
+}
+
+.content code {
+  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-size: 0.9em;
+  background: rgba(127, 127, 127, 0.12);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.content pre {
+  overflow-x: auto;
+  padding: 1rem;
+  background: rgba(127, 127, 127, 0.08);
+  border-radius: 6px;
+}
+
+.content pre code {
+  background: none;
+  padding: 0;
+}
+
+.content blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+}
+
+.pub-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pub-list li {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pub-list li:first-child {
+  padding-top: 0.3rem;
+}
+
+.pub-list li:last-child {
+  border-bottom: none;
+}
+
+.pub-date {
+  flex: 0 0 4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pub-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pub-title {
+  display: block;
+  font-weight: 600;
+}
+
+.pub-authors {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.pub-meta {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.pub-links {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  padding-left: 1rem;
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.pub-links .pub-link {
+  white-space: nowrap;
+}
+
+footer.site-footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}

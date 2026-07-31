@@ -1,0 +1,21 @@
+---
+layout: default
+---
+<header class="header">
+  {% if page.avatar %}
+  <img class="avatar" src="{{ page.avatar | relative_url }}" alt="{{ site.name }}">
+  {% endif %}
+  <div class="header-text">
+    <h1>{{ site.name }}</h1>
+    {% if page.subtitle %}<p class="subtitle">{{ page.subtitle }}</p>{% endif %}
+    {% if page.links %}
+    <p class="links">
+      {% for link in page.links %}<a href="{{ link.url }}">{{ link.label }}</a>{% unless forloop.last %} &middot; {% endunless %}{% endfor %}
+    </p>
+    {% endif %}
+  </div>
+</header>
+
+<article class="content">
+  {{ content }}
+</article>
