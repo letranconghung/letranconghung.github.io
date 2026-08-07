@@ -3,18 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% if page.title %}{{ page.title }} &middot; {% endif %}{{ site.title }}</title>
-  {% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}
+  <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+  {% assign page_description = page.description | default: site.description %}
+  {% if page_description %}<meta name="description" content="{{ page_description }}">{% endif %}
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="{{ site.title }}">
+  <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
+  {% if page_description %}<meta property="og:description" content="{{ page_description }}">{% endif %}
   {% if page.avatar %}<meta property="og:image" content="{{ page.avatar | absolute_url }}">{% endif %}
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="{{ site.title }}">
+  <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+  {% if page_description %}<meta name="twitter:description" content="{{ page_description }}">{% endif %}
   {% if page.avatar %}<meta name="twitter:image" content="{{ page.avatar | absolute_url }}">{% endif %}
+
+  {% if page.url == "/" %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Hung Le",
+    "alternateName": ["Hung T. C. Le", "Hung Le Tran Cong"],
+    "url": "{{ site.url }}{{ site.baseurl }}",
+    "image": "{{ page.avatar | absolute_url }}",
+    "jobTitle": "PhD Student",
+    "affiliation": {
+      "@type": "CollegeOrUniversity",
+      "name": "Princeton University, Operations Research and Financial Engineering (ORFE)"
+    },
+    "alumniOf": [
+      { "@type": "CollegeOrUniversity", "name": "Princeton University" },
+      { "@type": "CollegeOrUniversity", "name": "University of Chicago" }
+    ],
+    "knowsAbout": ["Machine Learning", "Deep Learning", "Reinforcement Learning", "Statistical Learning Theory"],
+    "sameAs": [
+      "https://github.com/letranconghung"
+    ]
+  }
+  </script>
+  {% endif %}
 </head>
 <body>
   <div class="page">
