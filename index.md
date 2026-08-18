@@ -13,7 +13,7 @@ avatar: /assets/images/headshot.jpg
 
 I'm Hung, a first-year PhD student at Princeton ORFE. I'm currently interested in the theoretical foundations of deep learning broadly interpreted, as inspired by [Misha Belkin](https://mishabelkin.substack.com/p/the-necessity-of-machine-learning) and [Becca Willett](https://willett.psd.uchicago.edu/research/#:~:text=Research,-Investing%20in%20applied), as well as my own (painful) experiences of applying it.
 
-I previously graduated from the University of Chicago with a B.S. in Mathematics, where I mainly spent my time on probability theory, statistical learning theory, and a lot of reinforcement learning for robotics. During this time I was fortunate to learn from and work with Ewain Gwynne, Matt Walter, Yuxin Chen, Shiry Ginosar, and Kaylene Stocking.
+I previously graduated from the University of Chicago with a B.S. in Mathematics, where I mainly spent my time on probability theory and reinforcement learning. During this time I was fortunate to learn from and work with Ewain Gwynne, Matt Walter, Yuxin Chen, Shiry Ginosar, and Kaylene Stocking.
 
 I am also interested in the theoretical foundations of RL, with a view towards applications in robotics.
 
