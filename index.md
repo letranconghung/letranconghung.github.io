@@ -1,7 +1,8 @@
 ---
 layout: home
 avatar: /assets/images/headshot.jpg
-# subtitle: "PhD Student, Princeton ORFE"
+title: Hung Le
+subtitle: "1st-year PhD @ Princeton ORFE"
 # links:
 #   - label: "Email"
 #     url: "mailto:conghungletran@gmail.com"
