@@ -9,7 +9,7 @@
 locale                   : "en-US"
 title                    : "Hung Le"
 name                     : "Hung Le"
-description              : "I am a first-year PhD student at Princeton ORFE working on the theoretical foundations of deep learning. I am in search of reasonable solvable models and realistic assumptions to do theory on."
+description              : "I am a first-year PhD student at Princeton ORFE working on deep learning theory. I am searching for reasonable solvable models and assumptions to do theory on."
 url                      : "https://letranconghung.github.io" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "/" # the subpath of your site, e.g. "/blog"
 repository               : "letranconghung/letranconghung.github.io" # GitHub username/repo-name
